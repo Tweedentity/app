@@ -1,0 +1,40 @@
+* {
+    margin: 0;
+}
+
+html,
+body {
+    background-color: #fff;
+    color: #0B1122;
+    font-family: 'Lato';
+    background: url(../img/background2.png) repeat-y;
+}
+
+.overHeader {
+    background-color: #444;
+    color: #fff;
+    text-align: center;
+    font-size: 80%;
+    padding: 4px;
+}
+
+.mr4 {
+    margin-right: 4px;
+}
+
+span.code {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 85%;
+}
+
+span.success {
+    color: #155724;
+}
+
+span.warning {
+    color: #856404;
+}
+
+span.danger {
+    color: #c7254e;
+}

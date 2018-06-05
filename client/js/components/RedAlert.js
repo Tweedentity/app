@@ -13,11 +13,14 @@ class RedAlert extends React.Component {
       </p>
       {
         this.props.link
-        ? <p>
-          <a href={this.props.link} target="_blank">
-            <Button>{this.props.linkText}</Button>
-          </a>
-        </p>
+        ? <p>{
+typeof this.props.link === 'string'
+            ? <a href={this.props.link} target="_blank">
+      <Button>{this.props.linkMessage}</Button>
+    </a>
+    : <Button onClick={this.props.link}>{this.props.linkMessage}</Button>
+
+            }</p>
         : ''
       }
     </Alert>

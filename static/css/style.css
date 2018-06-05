@@ -38,3 +38,36 @@ span.warning {
 span.danger {
     color: #c7254e;
 }
+
+.circled {
+    border-radius: 50px;
+}
+
+.tavatar {
+    width: 28px;
+    height: 28px;
+    margin-top: -6px;
+    margin-right: 4px;
+}
+
+.tname {
+    font-size: 1.6rem;
+}
+
+.dropdown-menu>li>span {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
+
+.mr12 {
+    margin-right: 12px;
+}
+
+.spacer {
+    margin: 6px;
+}

@@ -14,10 +14,10 @@ class LoadingButton extends React.Component {
         bsStyle={
           this.props.loading
             ? 'info'
-            : 'success'
+            : 'info'
         }
         onClick={this.props.cmd}
-        disabled={this.props.disabled}
+        disabled={this.props.disabled || this.props.loading}
         ref={this.button}
       >{
         this.props.loading

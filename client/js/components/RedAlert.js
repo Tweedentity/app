@@ -6,8 +6,13 @@ class RedAlert extends React.Component {
 
     return (
     <Alert bsStyle="danger">
-      <h4><i className="fa fa-exclamation-triangle mr4"></i>
-        {this.props.title}</h4>
+      {
+        this.props.title
+        ? <h4><i className="fa fa-exclamation-triangle mr4"></i>
+            {this.props.title}</h4>
+          : null
+      }
+
       <p>
         {this.props.message}
       </p>

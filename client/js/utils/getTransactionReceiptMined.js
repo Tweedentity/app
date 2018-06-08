@@ -1,4 +1,7 @@
 
+// thanks Xavier Leprêtre
+// https://gist.github.com/xavierlepretre/88682e871f4ad07be4534ae560692ee6
+
 function getTransactionReceiptMined(txHash, interval) {
   const self = this;
   const transactionReceiptAsync = function(resolve, reject) {

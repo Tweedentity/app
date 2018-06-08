@@ -1,5 +1,6 @@
 class Utils {
 
+
   static formatNumber(num) {
 
     if (num == '-') {

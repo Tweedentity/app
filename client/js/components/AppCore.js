@@ -1,15 +1,16 @@
 const ls = require('local-storage')
 import RedAlert from './RedAlert'
 import LoadingButton from './LoadingButton'
+import LoadingBadge from './LoadingBadge'
 
 const sigUtil = require('eth-sig-util')
-
+const EventWatcher = require('../utils/EventWatcher')
 const config = require('../config')
 
-const {Panel, Alert, Button, Row, Col, FormGroup, ControlLabel, FormControl, InputGroup, Badge, HelpBlock} = ReactBootstrap
+const {Panel, Alert, Button, Row, Col, FormGroup, ControlLabel, FormControl, InputGroup, HelpBlock} = ReactBootstrap
 
 
-class Verifier extends React.Component {
+class AppCore extends React.Component {
   constructor(props) {
     super(props)
 
@@ -18,13 +19,19 @@ class Verifier extends React.Component {
       err: null,
       loading: false
     }
-    for (let m of 'getStats,getEtherscan,getTwitterScreenName,handleChange,getValidationState,getUserId,signString,findTweet,startTransaction,setAddressState,getState,watch,goToProfile'.split(',')) {
+    for (let m of 'getStats getEtherscan getTwitterScreenName handleChange getValidationState getUserId signString findTweet startTransaction setAddressState getState goToProfile getGasInfo watchOracleTransactions'.split(' ')) {
       this[m] = this[m].bind(this)
     }
   }
 
+  componentDidMount() {
+    if (this.props.parentState.web3js) {
+      this.watcher = new EventWatcher(this.props.parentState.web3js)
+    }
+    this.getGasInfo()
+  }
+
   goToProfile() {
-    console.log('go to profile')
     this.resetAddressState()
     this.props.getTwitterUserId()
   }
@@ -111,7 +118,8 @@ class Verifier extends React.Component {
   signString(web3js, from, sigStr) {
 
     this.setAddressState({}, {
-      loading: true
+      loading: true,
+      err: null
     })
 
     const msgParams = [
@@ -127,27 +135,27 @@ class Verifier extends React.Component {
       params: [msgParams, from],
       from: from,
     }, (err, result) => {
-      if (err) return console.error(err)
-      if (result.error) {
-        return console.error(result.error.message)
-      }
-
-      const recovered = sigUtil.recoverTypedSignature({
-        data: msgParams,
-        sig: result.result
-      })
-
-      if (recovered === from) {
-        let tweet = `tweedentity(${from.substring(0, 4).toLowerCase()},twitter/${this.getState('userId')},${result.result},3,web3;1)`
-        this.setAddressState({
-          tweet,
-          sig: result.result,
-          step: 3
-        }, {
-          loading: false
-        })
+      if (err || result.error) {
+        this.setState({err: 'You denied the message signature', loading: false})
       } else {
-        alert('Failed to verify signer, got: ' + result)
+
+        const recovered = sigUtil.recoverTypedSignature({
+          data: msgParams,
+          sig: result.result
+        })
+
+        if (recovered === from) {
+          let tweet = `tweedentity(${from.substring(0, 6).toLowerCase()},twitter/${this.getState('userId')},${result.result},3,web3;1)`
+          this.setAddressState({
+            tweet,
+            sig: result.result,
+            step: 3
+          }, {
+            loading: false
+          })
+        } else {
+          this.setState({err: 'Failed to verify signer', loading: false})
+        }
       }
     })
 
@@ -227,7 +235,7 @@ class Verifier extends React.Component {
       body: JSON.stringify({
         network: state.netId,
         address: state.address
-      }),
+      })
     })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -253,6 +261,26 @@ class Verifier extends React.Component {
 
   getTwitterScreenName() {
     this.setAddressState({step: 1})
+    this.getGasInfo()
+  }
+
+  getGasInfo() {
+    return fetch(window.location.origin + '/api/gas-info?r=' + Math.random(), {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      }
+    })
+      .then((response) => response.json())
+      .then((gasInfo) => {
+        if (gasInfo && gasInfo.safeLow) {
+          this.setState({
+            gasInfo,
+            noGas: null
+          })
+        }
+      })
   }
 
   formatStats(stats, netId, address) {
@@ -271,133 +299,171 @@ class Verifier extends React.Component {
     )
   }
 
-  watch(events) {
+  watchOracleTransactions(network, address, startBlock, gas, callback) {
+    return fetch(window.location.origin + '/api/get-txs?r=' + Math.random(), {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        network: this.props.parentState.netId,
+        address,
+        startBlock,
+        gas
+      })
+    })
+      .then((response) => response.json())
+      .then(tx => {
 
-    const stopWatching = () => {
-      if (this.events) {
-        try {
-          for (e in this.events) {
-            e.stopWatching()
-          }
-        } catch (err) {
-        }
-        this.events = null
-      }
-    }
-
-    stopWatching()
-
-    this.events = []
-    let index = 0
-
-    for (let event of events) {
-      (function (e, self) {
-        self.events[index] = e[0](e[1], {
-          fromBlock: self.props.parentState.web3js.eth.blockNumer,
-          toBlock: 'latest'
-        })
-
-        self.events[index].watch((err, result) => {
-          self.setAddressState(e[2], e[3])
-          stopWatching()
-          if (typeof e[4] === 'function') {
-            e[4]()
-          }
-        })
-      })(event, this)
-      index++
-    }
+        callback(tx)
+      })
   }
+
 
   startTransaction(parentState) {
 
-    this.setState({
-      loading: true
+    this.setAddressState({
+      subStep: 0
+    }, {
+      loading: true,
+      err: null
     })
+
+    this.watcher.stop()
 
     const ethPrice = this.state.price
     const oraclizeCost = Math.round(1e7 / ethPrice)
 
-    const gasPrice = this.getState('gasInfo').safeLow * 1e8
-    const gasLimit = 173e3 + oraclizeCost
+    if (this.state.gasInfo) {
 
-    this.setAddressState({}, {
-      err: null
-    })
+      const gasPrice = this.state.gasInfo.safeLow * 1e8
+      const gasLimitBase = 170e3 + oraclizeCost
+      const gasLimit = gasLimitBase + Math.round(100 * Math.random())
 
-    let callbackEvents = [
-      [
-        parentState.store.IdentitySet,
-        {addr: parentState.address},
-        {verificationCompleted: true}
-      ],
-      [
-        parentState.verifier.VerificatioFailed,
-        {addr: parentState.address},
-        {step: 4},
-        {err: 'The transaction failed.'}
-      ],
-      [
-        parentState.manager.IdentityNotUpgradable,
-        {addr: parentState.address},
-        {step: 4},
-        {err: 'Identity not upgradable.'}
-      ]
-    ]
+      parentState.web3js.eth.getBlockNumber((err, blockNumber) => {
 
-    let startEvents = [
-      [
-        parentState.verifier.VerificationStarted,
-        {addr: parentState.address},
-        {verificationStarted: true},
-        {},
-        () => {
-          this.watch(callbackEvents)
+        let count = 0
+
+        let timerId
+        let watchTxs = () => {
+          this.watchOracleTransactions(
+            parentState.netId,
+            config.address.ropsten.claimer,
+            blockNumber,
+            gasLimit,
+            tx => {
+              if (tx && tx.isError) {
+                if (tx.isError === "1") {
+                  this.setState({err: 'The transaction from the oracle failed.', warn: null})
+                  this.watcher.stop()
+                }
+              } else {
+                timerId = setTimeout(watchTxs, 30000)
+                if (count > 5) {
+                  this.setState({warn: 'The oracle sometimes takes time. Please wait.'})
+                }
+                count++
+              }
+            })
         }
-      ]
-    ]
 
-    parentState.verifier.verifyAccountOwnership(
-      'twitter',
-      this.getState('tweetId'),
-      gasPrice,
-      gasLimit,
-      {
-        value: gasPrice * gasLimit,
-        gas: 285e3,
-        gasPrice
-      }, (err, txHash) => {
-        if (err) {
-          this.setAddressState({}, {
-            err: 'Transaction failed',
-            loading: false
+        console.log('blockNumber', blockNumber)
+
+        let callbackEvents = [
+          {
+            event: parentState.store.IdentitySet,
+            filter: {addr: parentState.address},
+            callback: () => {
+              this.setAddressState({subStep: 3}, {warn: null})
+              this.watcher.stop()
+              clearTimeout(timerId)
+            },
+            fromBlock: blockNumber
+          },
+          {
+            event: parentState.claimer.VerificatioFailed,
+            filter: {addr: parentState.address},
+            callback: () => {
+              this.setState({err: 'The transaction failed.', warn: null})
+              this.watcher.stop()
+              clearTimeout(timerId)
+            },
+            fromBlock: blockNumber
+          },
+          {
+            event: parentState.manager.IdentityNotUpgradable,
+            filter: {addr: parentState.address},
+            callback: () => {
+              this.setState({err: 'Identity not upgradable.', warn: null})
+              this.watcher.stop()
+              clearTimeout(timerId)
+            },
+            fromBlock: blockNumber
+          }
+        ]
+
+
+        let startEvents = [
+          {
+            event: parentState.claimer.VerificationStarted,
+            filter: {addr: parentState.address},
+            callback: () => {
+              this.setAddressState({subStep: 2})
+              this.watcher.stop()
+              this.watcher.watch(callbackEvents)
+              timerId = setTimeout(watchTxs, 30000)
+            },
+            fromBlock: blockNumber
+          }
+        ]
+
+        parentState.claimer.claimOwnership(
+          'twitter',
+          this.getState('tweetId'),
+          gasPrice,
+          gasLimit,
+          {
+            value: gasPrice * gasLimit,
+            gas: 200e3,
+            gasPrice
+          }, (err, txHash) => {
+            if (err) {
+              this.setState({
+                err: 'The transaction has been denied',
+                loading: false
+              })
+            }
+            else {
+              this.setAddressState({
+                txHash,
+                step: 5,
+                subStep: 1
+              }, {
+                loading: false
+              })
+              this.watcher.watch(startEvents)
+              this.watcher.waitFor(
+                txHash,
+                (receipt) => {
+                  return receipt.gasUsed > 16e4
+                },
+                null,
+                () => {
+                  this.setState({
+                    err: 'The transaction has been reverted'
+                  })
+                }
+              )
+            }
           })
-        }
-        else {
-          this.setAddressState({
-            txHash,
-            step: 5
-          }, {
-            loading: false
-          })
-          this.watch(startEvents)
-          // parentState.web3js.eth.getTransactionReceiptMined(txHash)
-          //     .then(receipt => {
-          //       if (receipt.logs.length == 1) {
-          //         this.setAddressState({
-          //           waiting: true
-          //         })
-          //         this.watch(callbackEvents)
-          //       } else {
-          //         this.setAddressState({
-          //           step: 4
-          //         }, {
-          //           err: 'Transaction reverted'
-          //         })
-          //       }
-          //     })
-        }
       })
+    } else {
+      this.setState({
+        noGas: true,
+        err: 'Trying to load gas info. Wait a moment and try again, please.'
+      })
+    }
   }
 
   formatFloat(f, d) {
@@ -561,7 +627,7 @@ class Verifier extends React.Component {
                 <Row>
                   <Col md={12}>
                     {ps.netId === '1' && mainStats.balance < minimum ? lowBalance : ''}
-                    <Alert bsStyle={score < 3 ? 'success' : score < 5 ? 'warning' : 'danger'}>
+                    <Alert bsStyle={score < 3 ? 'info' : score < 5 ? 'warning' : 'danger'}>
                       <p>{
                         score < 3
                           ? nextStep
@@ -576,7 +642,7 @@ class Verifier extends React.Component {
                 </Row>
                 <Row>
                   <Col md={12}>
-                    <Button bsStyle={score < 3 ? 'success' : score < 5 ? 'warning' : 'danger'}
+                    <Button bsStyle={score < 3 ? 'info' : score < 5 ? 'warning' : 'danger'}
                             onClick={this.getTwitterScreenName}>
                       {score < 3 ? 'Use this wallet' : 'Use this wallet, anyway. I know what I am doing'}
                     </Button>
@@ -662,8 +728,14 @@ class Verifier extends React.Component {
                           the
                           cryptographic signature of the following string, using your current Ethereum address:</p>
                         <p><code>{sigStr}</code></p>
-
-                        <p style={{paddingTop: 20}}>
+                        {
+                          this.state.err
+                            ? <RedAlert
+                              message={this.state.err}
+                            />
+                            : ''
+                        }
+                        <p>
                           <LoadingButton
                             text="Sign it now"
                             loadingText="Waiting for signature"
@@ -767,7 +839,7 @@ class Verifier extends React.Component {
           } else if (state.step === 4) {
 
             const price = parseFloat(this.state.price, 10)
-            const gasPrice = state.gasInfo.safeLow * 1e8
+            const gasPrice = this.state.gasInfo.safeLow * 1e8
             const gasLimit = 185e3
 
             const cost = this.formatFloat(gasPrice * gasLimit / 1e18, 4)
@@ -778,7 +850,7 @@ class Verifier extends React.Component {
               gas: 255e3,
             }
 
-            const etherscanUrl = `https://${ps.netId === '3' ? 'ropsten.' : ''}etherscan.io/address/${ config.address[ps.netId === '3' ? 'ropsten' : 'main'].verifier }`
+            const etherscanUrl = `https://${ps.netId === '3' ? 'ropsten.' : ''}etherscan.io/address/${ config.address[ps.netId === '3' ? 'ropsten' : 'main'].claimer }`
 
             return (
               <Row>
@@ -821,36 +893,73 @@ class Verifier extends React.Component {
             )
           } else if (state.step === 5) {
 
+            let transaction = <a
+              href={'https://' + (ps.netId === '3' ? 'ropsten.' : '') + 'etherscan.io/tx/' + state.txHash}
+              target="_blank">transaction</a>
+
             return (
               <Row>
                 <Col md={12}>
                   <h4 style={{paddingLeft: 15}}>Verification started
-                  </h4>{
-                  this.getAddressState('verificationCompleted')
-                    ? null
-                    : <p><img src="img/spinner.svg"/></p>
-                }
-                  <p><span className="mr12"><Badge>1</Badge></span>
-                    Waiting for confirmations of the <a
-                      href={'https://' + (ps.netId === '3' ? 'ropsten.' : '') + 'etherscan.io/tx/' + state.txHash}
-                      target="_blank">transaction</a>.</p>
+                  </h4>
+                  <p><span className="mr12">
+                    <LoadingBadge
+                      text="1"
+                      loading={false}
+                    />
+                  </span>
+                    The transaction has been requested.</p>
+                  <p><span className="mr12">
+                    <LoadingBadge
+                      text="2"
+                      loading={state.subStep < 2 && !this.state.err}
+                    />
+                  </span>
+                    {
+                      state.subStep === 2
+                        ? <span>The {transaction} has been successfully confirmed.</span>
+                        : state.subStep === 1
+                        ? <span>The {transaction} has been included in a block. Waiting for confirmations.</span>
+                        : <span>Waiting for the transaction to be included in a block.</span>
+
+                    }
+                  </p>
                   {
-                    this.getAddressState('verificationStarted')
-                      ? <p><span className="mr12"><Badge>2</Badge></span>
-                        Transaction confirmed. Waiting for the oracle which is verifying the
-                        tweet.</p>
+                    state.subStep > 1
+                      ? <p><span className="mr12">
+                      <LoadingBadge
+                        text="3"
+                        loading={state.subStep < 3 && !this.state.err}
+                      />
+                      </span>
+                        {
+                          state.subStep === 3
+                            ? <span>The oracle has confirmed the ownership.</span>
+                            : <span>Waiting for the oracle which is verifying the ownership.</span>
+                        }</p>
+                      : null
+                  }
+                  {
+                    state.subStep === 3
+                      ?
+                      <p><Button style={{marginTop: 6}} bsStyle="success" onClick={this.goToProfile}>Go to your
+                        profile</Button>
+                      </p>
                       : ''
                   }
                   {
-                    this.getAddressState('verificationCompleted')
-                      ? <div>
-                        <p><span className="mr12"><Badge>3</Badge></span>
-                          Wow. Verification confirmed.</p>
-                        <p><Button style={{marginTop: 6}} bsStyle="success" onClick={this.goToProfile}>Go to your
-                          profile</Button>
-                        </p>
-
-                      </div>
+                    this.state.err
+                      ?
+                      <RedAlert
+                        title="Whoops"
+                        message={this.state.err}
+                        link={() => {
+                          this.setAddressState({step: 4}, {err: null})
+                        }}
+                        linkMessage="Go back"
+                      />
+                      : this.state.warn
+                      ? <Alert bsStyle="warning">{this.state.warn}</Alert>
                       : ''
                   }
                 </Col>
@@ -877,4 +986,4 @@ class Verifier extends React.Component {
   }
 }
 
-export default Verifier
+export default AppCore

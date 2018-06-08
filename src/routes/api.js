@@ -44,6 +44,20 @@ router.post('/wallet-stats', jsonParser, function (req, res, next) {
 
 })
 
+router.post('/get-txs', jsonParser, function (req, res, next) {
+  provider.getTxs(req.body)
+    .then(results => {
+      if (results.error) {
+        throw(new Error(results.error))
+      }
+      res.status(200).json(results)
+    })
+    .catch(err => {
+      console.log({error: err.message })
+      res.status(200).json({error: 'Api not available' })
+    })
+})
+
 
 router.post('/scan-tweets', jsonParser, function (req, res, next) {
 
@@ -52,14 +66,25 @@ router.post('/scan-tweets', jsonParser, function (req, res, next) {
     if (results.error) {
       throw(new Error(results.error))
     }
-    results[0].gasInfo = results[1]
-    res.status(200).json(results[0])
+    res.status(200).json(results)
   })
   .catch(err => {
     console.log({error: err.message })
 
     res.status(200).json({error: err.message })
   })
+
+})
+
+router.get('/gas-info', function (req, res, next) {
+
+  provider.getGasInfo()
+    .then(results => {
+      res.status(200).json(results)
+    })
+    .catch(err => {
+      res.status(200).json({error: "Error retrieving gas info" })
+    })
 
 })
 

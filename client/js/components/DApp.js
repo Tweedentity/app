@@ -4,7 +4,7 @@ const config = require('../config')
 let web3js
 
 import Topbar from './Topbar'
-import Verifier from './Verifier'
+import AppCore from './AppCore'
 import NetworkStatus from './NetworkStatus'
 
 const {Grid, Jumbotron} = ReactBootstrap
@@ -24,7 +24,7 @@ class DApp extends React.Component {
     if (typeof web3 !== 'undefined') {
       console.log('Using web3 detected from external source like Metamask')
 
-      web3js = this.state.web3js = new Web3(web3.currentProvider)
+      web3js = window.web3js = this.state.web3js = new Web3(web3.currentProvider)
       web3js.eth.getTransactionReceiptMined = require("../utils/getTransactionReceiptMined")
 
       this.getNetwork()
@@ -44,7 +44,7 @@ class DApp extends React.Component {
 
       const storeContract = web3js.eth.contract(config.abi.store)
       const managerContract = web3js.eth.contract(config.abi.manager)
-      const verifierContract = web3js.eth.contract(config.abi.verifier)
+      const verifierContract = web3js.eth.contract(config.abi.claimer)
 
       let env
 
@@ -69,7 +69,7 @@ class DApp extends React.Component {
         this.setState({
           store: storeContract.at(config.address[env].store),
           manager: managerContract.at(config.address[env].manager),
-          verifier: verifierContract.at(config.address[env].verifier),
+          claimer: verifierContract.at(config.address[env].claimer),
           netId,
           connected: 1
         })
@@ -144,7 +144,7 @@ class DApp extends React.Component {
           <NetworkStatus parentState={this.state}/>
           <Topbar parentState={this.state}/>
           <Grid>
-            <Verifier parentState={this.state} getTwitterUserId={this.getTwitterUserId}/>
+            <AppCore parentState={this.state} getTwitterUserId={this.getTwitterUserId}/>
           </Grid>
         </div>
     )

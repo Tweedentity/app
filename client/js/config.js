@@ -4,6 +4,20 @@ module.exports = {
       {
         "constant": true,
         "inputs": [],
+        "name": "manager",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
         "name": "appSet",
         "outputs": [
           {
@@ -190,34 +204,6 @@ module.exports = {
       },
       {
         "constant": true,
-        "inputs": [],
-        "name": "getAppNickname",
-        "outputs": [
-          {
-            "name": "",
-            "type": "bytes32"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getAppId",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
         "inputs": [
           {
             "name": "_uid",
@@ -303,19 +289,38 @@ module.exports = {
             "type": "address"
           }
         ],
-        "name": "removeIdentity",
+        "name": "unsetIdentity",
         "outputs": [],
         "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
       },
       {
-        "constant": false,
+        "constant": true,
         "inputs": [],
-        "name": "removeMyIdentity",
-        "outputs": [],
+        "name": "getAppNickname",
+        "outputs": [
+          {
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
         "payable": false,
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "getAppId",
+        "outputs": [
+          {
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
         "type": "function"
       },
       {
@@ -437,35 +442,7 @@ module.exports = {
       {
         "constant": true,
         "inputs": [],
-        "name": "devLevel",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
         "name": "notUpgradableInStore",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "totalAuthorized",
         "outputs": [
           {
             "name": "",
@@ -492,12 +469,17 @@ module.exports = {
       },
       {
         "constant": true,
-        "inputs": [],
-        "name": "authorizerLevel",
+        "inputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "name": "customerService",
         "outputs": [
           {
             "name": "",
-            "type": "uint256"
+            "type": "bool"
           }
         ],
         "payable": false,
@@ -521,80 +503,11 @@ module.exports = {
       {
         "constant": true,
         "inputs": [],
-        "name": "version",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [],
-        "name": "deAuthorize",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "verifierLevel",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
         "name": "uidNotUpgradable",
         "outputs": [
           {
             "name": "",
             "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_maxLevel",
-            "type": "uint256"
-          },
-          {
-            "name": "_authorizerLevel",
-            "type": "uint256"
-          }
-        ],
-        "name": "setLevels",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "getAuthorized",
-        "outputs": [
-          {
-            "name": "",
-            "type": "address[]"
           }
         ],
         "payable": false,
@@ -634,25 +547,6 @@ module.exports = {
         "inputs": [
           {
             "name": "",
-            "type": "address"
-          }
-        ],
-        "name": "authorized",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "",
             "type": "uint256"
           }
         ],
@@ -668,31 +562,13 @@ module.exports = {
         "type": "function"
       },
       {
-        "constant": false,
-        "inputs": [
-          {
-            "name": "_address",
-            "type": "address"
-          },
-          {
-            "name": "_level",
-            "type": "uint256"
-          }
-        ],
-        "name": "authorize",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
         "constant": true,
         "inputs": [],
-        "name": "maxLevel",
+        "name": "claimer",
         "outputs": [
           {
             "name": "",
-            "type": "uint256"
+            "type": "address"
           }
         ],
         "payable": false,
@@ -701,12 +577,17 @@ module.exports = {
       },
       {
         "constant": true,
-        "inputs": [],
-        "name": "customerServiceLevel",
-        "outputs": [
+        "inputs": [
           {
             "name": "",
             "type": "uint256"
+          }
+        ],
+        "name": "customerServiceAddress",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
           }
         ],
         "payable": false,
@@ -735,20 +616,6 @@ module.exports = {
           {
             "name": "",
             "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "amIAuthorized",
-        "outputs": [
-          {
-            "name": "",
-            "type": "bool"
           }
         ],
         "payable": false,
@@ -812,45 +679,6 @@ module.exports = {
         "anonymous": false,
         "inputs": [
           {
-            "indexed": false,
-            "name": "_authorizer",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_authorized",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_level",
-            "type": "uint256"
-          }
-        ],
-        "name": "AuthorizedAdded",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
-            "indexed": false,
-            "name": "_authorizer",
-            "type": "address"
-          },
-          {
-            "indexed": false,
-            "name": "_authorized",
-            "type": "address"
-          }
-        ],
-        "name": "AuthorizedRemoved",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [
-          {
             "indexed": true,
             "name": "previousOwner",
             "type": "address"
@@ -863,25 +691,6 @@ module.exports = {
         ],
         "name": "OwnershipTransferred",
         "type": "event"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_nickname",
-            "type": "string"
-          }
-        ],
-        "name": "getAppId",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
       },
       {
         "constant": false,
@@ -925,6 +734,57 @@ module.exports = {
         "type": "function"
       },
       {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "_address",
+            "type": "address"
+          }
+        ],
+        "name": "setClaimer",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "_address",
+            "type": "address"
+          },
+          {
+            "name": "_status",
+            "type": "bool"
+          }
+        ],
+        "name": "setCustomerService",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [
+          {
+            "name": "_nickname",
+            "type": "string"
+          }
+        ],
+        "name": "getAppId",
+        "outputs": [
+          {
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
         "constant": true,
         "inputs": [
           {
@@ -947,7 +807,7 @@ module.exports = {
         "constant": true,
         "inputs": [
           {
-            "name": "_id",
+            "name": "_appId",
             "type": "uint256"
           },
           {
@@ -1004,7 +864,7 @@ module.exports = {
             "type": "address"
           }
         ],
-        "name": "removeIdentity",
+        "name": "unsetIdentity",
         "outputs": [],
         "payable": false,
         "stateMutability": "nonpayable",
@@ -1039,7 +899,7 @@ module.exports = {
         "type": "function"
       }
     ],
-    verifier: [
+    claimer: [
       {
         "constant": true,
         "inputs": [],
@@ -1048,20 +908,6 @@ module.exports = {
           {
             "name": "",
             "type": "address"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "version",
-        "outputs": [
-          {
-            "name": "",
-            "type": "uint256"
           }
         ],
         "payable": false,
@@ -1129,6 +975,11 @@ module.exports = {
         "inputs": [
           {
             "indexed": false,
+            "name": "oraclizeId",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
             "name": "addr",
             "type": "address"
           },
@@ -1141,11 +992,6 @@ module.exports = {
             "indexed": false,
             "name": "postId",
             "type": "string"
-          },
-          {
-            "indexed": false,
-            "name": "oraclizeId",
-            "type": "bytes32"
           }
         ],
         "name": "VerificationStarted",
@@ -1154,11 +1000,6 @@ module.exports = {
       {
         "anonymous": false,
         "inputs": [
-          {
-            "indexed": false,
-            "name": "addr",
-            "type": "address"
-          },
           {
             "indexed": false,
             "name": "oraclizeId",
@@ -1207,7 +1048,7 @@ module.exports = {
             "type": "string"
           },
           {
-            "name": "_pathname",
+            "name": "_postId",
             "type": "string"
           },
           {
@@ -1219,7 +1060,7 @@ module.exports = {
             "type": "uint256"
           }
         ],
-        "name": "verifyAccountOwnership",
+        "name": "claimOwnership",
         "outputs": [],
         "payable": true,
         "stateMutability": "payable",
@@ -1271,17 +1112,17 @@ module.exports = {
     main: {
       manager: '',
       store: '',
-      verifier: ''
+      claimer: ''
     },
     ropsten: {
-      store: '0xa46dc29838820416b369b85d032def405ea82176',
-      manager: '0xe2872c277d37a8191eca81d9ef3136ded6694dbc',
-      verifier: '0x8f8b735131f81d3f49fc79ce851cb61c52cecc1f'
+      store: '0xe5277b95e1d4dbc9183686deee59619779005e85',
+      manager: '0x3326dfffe082df29d2795e7d18831014c95f04e2',
+      claimer: '0xc46bda87cc365b752d3db2eef1ec8487010e49c7'
     },
     private: {
       manager: '',
       store: '',
-      verifier: ''
+      claimer: ''
     }
   }
 }

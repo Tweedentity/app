@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 source docker/.default.env && docker run -it --rm \
-  --name tweedentity-dev \
+  --name tweedentity-app-dev \
   --link tweedentity-redis:redis \
   -p 9095:9095 \
   -v $PWD:/usr/src/app \

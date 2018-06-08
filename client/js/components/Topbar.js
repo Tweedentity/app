@@ -38,7 +38,7 @@ class Topbar extends React.Component {
         >
           <Navbar.Header>
             <Navbar.Brand>
-              <img src="img/tweedentity4.png" style={{marginTop: -1}}/>
+              <img src="img/tweedentity-full-logo-w-ico.png" style={{marginTop: -1}}/>
             </Navbar.Brand>
             <Navbar.Toggle/>
           </Navbar.Header>

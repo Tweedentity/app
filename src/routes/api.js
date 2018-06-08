@@ -44,16 +44,47 @@ router.post('/wallet-stats', jsonParser, function (req, res, next) {
 
 })
 
+router.post('/get-txs', jsonParser, function (req, res, next) {
+  provider.getTxs(req.body)
+    .then(results => {
+      if (results.error) {
+        throw(new Error(results.error))
+      }
+      res.status(200).json(results)
+    })
+    .catch(err => {
+      console.log({error: err.message })
+      res.status(200).json({error: 'Api not available' })
+    })
+})
+
 
 router.post('/scan-tweets', jsonParser, function (req, res, next) {
 
   provider.scanTweets(req.body.screenName, req.body.sig)
-  .then(result => {
-    res.status(200).json(result)
+  .then(results => {
+    if (results.error) {
+      throw(new Error(results.error))
+    }
+    res.status(200).json(results)
   })
   .catch(err => {
-    res.status(500)
+    console.log({error: err.message })
+
+    res.status(200).json({error: err.message })
   })
+
+})
+
+router.get('/gas-info', function (req, res, next) {
+
+  provider.getGasInfo()
+    .then(results => {
+      res.status(200).json(results)
+    })
+    .catch(err => {
+      res.status(200).json({error: "Error retrieving gas info" })
+    })
 
 })
 
@@ -65,10 +96,24 @@ router.post('/twitter-user-id', jsonParser, function (req, res, next) {
     res.status(200).json(result)
   })
   .catch(err => {
-    res.status(500)
+    res.status(200).json({error: err.message })
   })
 
 })
+
+router.post('/twitter-data', jsonParser, function (req, res, next) {
+
+  provider.getDataFromUserId(req.body.userId)
+      .then(result => {
+        res.status(200).json(result)
+      })
+      .catch(err => {
+        res.status(500)
+      })
+
+})
+
+
 
 router.get('/', function (req, res, next) {
 

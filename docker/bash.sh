@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-host=tweedentity-web
+host=tweedentity-app
 
 if [[ $1 != '' ]]; then
   host=$1

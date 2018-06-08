@@ -32,25 +32,9 @@ app.use(morgan('combined', {stream: accessLogStream}))
 
 app.use(cookieParser())
 
-app.get('/dapp', function (req, res, next) {
-  res.contentType('html')
-  res.send(fs.readFileSync(path.resolve(__dirname, '../static/dapp.html'), 'utf-8'))
-})
-
 app.get('/debug-index.html', function (req, res, next) {
-  if (app.get('env') === 'development') {
-    res.contentType('html')
-    res.send(fs.readFileSync(path.resolve(__dirname, '../static/debug-index.html'), 'utf-8'))
-  } else res.sendStatus(403)
+  next()
 })
-
-app.get('/debug-dapp.html', function (req, res, next) {
-  if (app.get('env') === 'development') {
-    res.contentType('html')
-    res.send(fs.readFileSync(path.resolve(__dirname, '../static/debug-dapp.html'), 'utf-8'))
-  } else res.sendStatus(403)
-})
-
 
 app.use(express.static(path.resolve(__dirname, '../static')))
 

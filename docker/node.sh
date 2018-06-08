@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
-docker stop tweedentity-web-debug
-docker rm tweedentity-web-debug
+docker stop tweedentity-app-debug
+docker rm tweedentity-app-debug
 
-docker stop tweedentity-web
-docker rm tweedentity-web
+docker stop tweedentity-app
+docker rm tweedentity-app
 
 source docker/.default.env && docker run -d \
-  --name tweedentity-web \
+  --name tweedentity-app \
   --link tweedentity-redis:redis \
-  -p 9094 \
+  -p 9095 \
   --restart unless-stopped \
   -v $PWD:/usr/src/app \
-  -v /vol/log/tweedentity:/var/log/tweedentity \
+  -v /vol/log/tweedentity_app:/var/log/tweedentity_app \
   -e NODE_ENV=production \
-  -e VIRTUAL_HOST=tweedentity.com,www.tweedentity.com \
-  -e LETSENCRYPT_HOST=tweedentity.com,www.tweedentity.com \
+  -e VIRTUAL_HOST=app.tweedentity.com \
+  -e LETSENCRYPT_HOST=app.tweedentity.com \
   -e LETSENCRYPT_EMAIL=admin@tweedentity.com \
   -w /usr/src/app node:6 npm run start
 

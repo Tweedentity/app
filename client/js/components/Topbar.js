@@ -4,44 +4,50 @@ class Topbar extends React.Component {
 
   render() {
 
-    return (
-    <Navbar
-    staticTop
-    componentClass="header"
-    className="bs-docs-nav"
-    role="banner"
-    >
-      <Navbar.Header>
-        <Navbar.Brand>
-          <img src="img/tweedentity-black.png" style={{marginTop: -1}}/>
-        </Navbar.Brand>
-        <Navbar.Toggle/>
-      </Navbar.Header>
-      <Navbar.Collapse>
-        {/*<Nav>*/}
-        {/*<NavItem eventKey={1} href="#">*/}
-        {/*Link*/}
-        {/*</NavItem>*/}
-        {/*<NavItem eventKey={2} href="#">*/}
-        {/*Link*/}
-        {/*</NavItem>*/}
-        {/*</Nav>*/}
-        <Nav pullRight>
-          {
-            this.props.parentState.defaultAccount ?
-            <NavDropdown eventKey={3} title={'Logged wallet: ' + this.props.parentState.defaultAccount}
-                         id="basic-nav-dropdown">
-              <MenuItem eventKey={3.1}>Action</MenuItem>
-              <MenuItem eventKey={3.2}>Another action</MenuItem>
-              <MenuItem eventKey={3.3}>Something else here</MenuItem>
-              <MenuItem divider/>
-              <MenuItem eventKey={3.4}>Separated link</MenuItem>
-            </NavDropdown>
-            : null
-          }
+    let dropDown
+
+    let ps = this.props.parentState
+
+    if (ps.address) {
+
+      if (ps.twitterUserId && ps.userName) {
+        dropDown = <NavDropdown eventKey={3} title={<img src={ps.avatar} className="tavatar circled"/>}
+                                id="basic-nav-dropdown">
+          <li role="presentation">
+            <span><b className="tname">{ps.name}</b><br/>
+              @{ps.userName}</span>
+          </li>
+          <MenuItem divider/>
+          <MenuItem eventKey={3.1}>Settings</MenuItem>
+        </NavDropdown>
+      } else {
+        dropDown = <Nav>
+          <NavItem eventKey={1} href="#">
+            {'Wallet ' + this.props.parentState.address.substring(0, 6) + ' (anonymous)'}
+          </NavItem>
         </Nav>
-      </Navbar.Collapse>
-    </Navbar>
+      }
+    }
+
+    return (
+        <Navbar
+            staticTop
+            componentClass="header"
+            className="bs-docs-nav"
+            role="banner"
+        >
+          <Navbar.Header>
+            <Navbar.Brand>
+              <img src="img/tweedentity-full-logo-w-ico.png" style={{marginTop: -1}}/>
+            </Navbar.Brand>
+            <Navbar.Toggle/>
+          </Navbar.Header>
+          <Navbar.Collapse>
+            <Nav pullRight>
+              {dropDown}
+            </Nav>
+          </Navbar.Collapse>
+        </Navbar>
     )
   }
 }

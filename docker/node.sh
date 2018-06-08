@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 
-docker stop tweedentity-app-debug
-docker rm tweedentity-app-debug
-
 docker stop tweedentity-app
 docker rm tweedentity-app
 
-source docker/.default.env && docker run -d \
+docker run -d \
   --name tweedentity-app \
   --link tweedentity-redis:redis \
   -p 9095 \

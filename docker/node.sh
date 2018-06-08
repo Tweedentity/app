@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+docker stop tweedentity-app-debug
+docker rm tweedentity-app-debug
+
 docker stop tweedentity-app
 docker rm tweedentity-app
 

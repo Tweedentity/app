@@ -1,12 +1,13 @@
 const {Nav, NavItem, NavDropdown, MenuItem, Navbar} = ReactBootstrap
+import NetworkStatus from './NetworkStatus'
 
-class Topbar extends React.Component {
+class Header extends React.Component {
 
   render() {
 
     let dropDown
 
-    let ps = this.props.parentState
+    let ps = this.props.appState
 
     if (ps.address) {
 
@@ -23,13 +24,15 @@ class Topbar extends React.Component {
       } else {
         dropDown = <Nav>
           <NavItem eventKey={1} href="#">
-            {'Wallet ' + this.props.parentState.address.substring(0, 6) + ' (anonymous)'}
+            {'Wallet ' + this.props.appState.address.substring(0, 6) + ' (anonymous)'}
           </NavItem>
         </Nav>
       }
     }
 
     return (
+      <div>
+        <NetworkStatus appState={this.props.appState}/>
         <Navbar
             staticTop
             componentClass="header"
@@ -48,8 +51,9 @@ class Topbar extends React.Component {
             </Nav>
           </Navbar.Collapse>
         </Navbar>
+      </div>
     )
   }
 }
 
-export default Topbar
+export default Header

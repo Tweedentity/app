@@ -1,6 +1,4 @@
 const path = require('path')
-const setEnv = require('./src/lib/setEnv')
-setEnv(path.join(__dirname, 'default.env.json'))
 
 if (process.argv[2] === '--redis-local') {
   process.env.REDIS_PORT_6379_TCP_ADDR = '127.0.0.1'

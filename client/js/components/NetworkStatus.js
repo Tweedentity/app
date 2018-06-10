@@ -4,7 +4,7 @@ class NetworkStatus extends React.Component {
   render() {
 
 
-    const netId = this.props.parentState.netId
+    const netId = this.props.appState.netId
     let connectedTo = '...'
 
     if (netId == null) {

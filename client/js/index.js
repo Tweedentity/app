@@ -1,5 +1,5 @@
 
-import DApp from './components/DApp'
+import App from './components/App'
 
-ReactDOM.render(<DApp/>, document.getElementById('app'))
+ReactDOM.render(<App/>, document.getElementById('app'))
 

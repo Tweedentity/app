@@ -280,13 +280,13 @@ class Provider {
 
           let title = $('title').text().split(' (@')
           let name = title[0]
-          let userName = title[1].split(')')[0]
+          let username = title[1].split(')')[0]
           let avatar = $('img.photo').attr('src')
 
           return Promise.resolve({
             result: {
               name,
-              userName,
+              username,
               avatar
             }
           })
@@ -306,26 +306,57 @@ class Provider {
 
     const gasUrl = 'https://ethgasstation.info/json/ethgasAPI.json'
 
-    return request
-      .get(gasUrl)
-      .set('Accept', 'application/json')
-      .then(info => {
-        let gasInfo = {}
-        try {
+    return db.getAsync('gasInfo')
+      .then(gasinfo => {
+        if (gasinfo && false) {
+          return Promise.resolve(JSON.parse(gasInfo))
+        } else {
+          return request
+            .get(gasUrl)
+            .set('Accept', 'application/json')
+            .then(info => {
+              let gasInfo = {}
+              try {
 
-          gasInfo = {
-            safeLow: info.body.safeLow,
-            block_time: info.body.block_time,
-            safeLowWait: info.body.safeLowWait,
-            average: info.body.average,
-            avgWait: info.body.avgWait
-          }
-        } catch (e) {
+                gasInfo = {
+                  safeLow: info.body.safeLow,
+                  block_time: info.body.block_time,
+                  safeLowWait: info.body.safeLowWait,
+                  average: info.body.average,
+                  avgWait: info.body.avgWait
+                }
+              } catch (e) {
+              }
+              db.set('gasInfo', JSON.stringify(gasInfo), 'EX', 300)
+              return Promise.resolve(gasInfo)
+            })
         }
-        return Promise.resolve(gasInfo)
       })
+
   }
 
+  getAbi(network, address) {
+
+    const key = `abi:${network}:${address}`
+    return db.getAsync(key)
+      .then(abi => {
+        if (abi && false) {
+          return Promise.resolve([address, JSON.parse(abi)])
+        } else {
+
+          const url = `http://api${network == '3' ? '-ropsten' : ''}.etherscan.io/api?module=contract&action=getabi&address=${address}&apikey=${etherscanApiKey}`
+
+          return request
+            .get(url)
+            .then(res => {
+              abi = res.body.result
+              db.set(key, abi)
+              return Promise.resolve([address, JSON.parse(abi)])
+            })
+        }
+      })
+
+  }
 }
 
 module.exports = new Provider

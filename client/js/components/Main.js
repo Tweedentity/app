@@ -407,7 +407,7 @@ class Main extends React.Component {
           gasLimit,
           {
             value: gasPrice * gasLimit,
-            gas: 200e3,
+            gas: 270e3,
             gasPrice
           }, (err, txHash) => {
             if (err) {

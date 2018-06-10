@@ -1,4 +1,3 @@
-const ls = require('local-storage')
 import RedAlert from './RedAlert'
 import LoadingButton from './LoadingButton'
 import LoadingBadge from './LoadingBadge'
@@ -14,33 +13,49 @@ class Main extends React.Component {
   constructor(props) {
     super(props)
 
-    for (let m of 'getStats getEtherscan getTwitterScreenName handleChange getValidationState getUserId signString findTweet startTransaction setGlobalState getGlobalState goToProfile getGasInfo watchOracleTransactions'.split(' ')) {
+    for (let m of 'getStats getEtherscan getTwitterScreenName handleChange getValidationState getUserId signString findTweet startTransaction setGlobalState getGlobalState goToProfile getGasInfo watchOracleTransactions shortWallet'.split(' ')) {
       this[m] = this[m].bind(this)
     }
   }
 
   getGlobalState(prop) {
-    if (this.props.appState.wallet) {
-      return this.props.db[this.props.appState.wallet][prop]
+    const as = this.props.appState
+    const shortWallet = this.shortWallet()
+    if (as.wallet) {
+      return as.data[shortWallet][prop]
     }
   }
 
   setGlobalState(pars, states = {}) {
     if (this.props.appState.wallet) {
-      this.props.db.put(this.props.appState.wallet, pars)
+      this.props.db.put(this.shortWallet(), pars)
+      this.props.setAppState(states)
     }
-    this.props.setAppState(states)
   }
 
   componentDidMount() {
-    if (this.props.appState.web3js) {
-      this.watcher = new EventWatcher(this.props.appState.web3js)
+    if (this.props.web3js) {
+      this.watcher = new EventWatcher(this.props.web3js)
+      const checkState = () => {
+        if (this.props.appState.wallet) {
+          if (this.getGlobalState('step') === 5) {
+            this.setGlobalState({step: 4})
+          }
+        } else {
+          setTimeout(checkState, 100)
+        }
+      }
+      checkState()
     }
     this.getGasInfo()
   }
 
+  shortWallet() {
+    return this.props.appState.wallet.substring(0, 6)
+  }
+
   goToProfile() {
-    this.props.db(this.props.appState.wallet, {})
+    this.props.db.clear(this.shortWallet(), {step: -1})
     this.props.getAccounts()
   }
 
@@ -91,7 +106,7 @@ class Main extends React.Component {
     event.target.select()
   }
 
-  signString(web3js, from, sigStr) {
+  signString(from, sigStr) {
 
     this.setGlobalState({}, {
       loading: true,
@@ -106,7 +121,7 @@ class Main extends React.Component {
       }
     ]
 
-    web3js.currentProvider.sendAsync({
+    this.props.web3js.currentProvider.sendAsync({
       method: 'eth_signTypedData',
       params: [msgParams, from],
       from: from,
@@ -204,20 +219,16 @@ class Main extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        network: state.netId,
         address: state.wallet
       })
     })
       .then((response) => response.json())
       .then((responseJson) => {
-        let price = responseJson.result.price
-        delete responseJson.result.price
         this.setGlobalState({
-          stats: responseJson.result,
+          stats: responseJson,
           step: 0
         }, {
-          loading: false,
-          price
+          loading: false
         })
       })
   }
@@ -303,17 +314,18 @@ class Main extends React.Component {
 
     this.watcher.stop()
 
-    const ethPrice = this.getGlobalState('price')
-    const oraclizeCost = Math.round(1e7 / ethPrice)
+    const as = this.props.appState
+    const ethPrice = as.price
+    const gasInfo = as.gasInfo
 
-    const gasInfo = this.getGlobalState('gasInfo')
-    if (gasInfo) {
+    if (ethPrice && gasInfo) {
 
+      const oraclizeCost = Math.round(1e7 / ethPrice)
       const gasPrice = gasInfo.safeLow * 1e8
       const gasLimitBase = 170e3 + oraclizeCost
       const gasLimit = gasLimitBase + Math.round(100 * Math.random())
 
-      appState.web3js.eth.getBlockNumber((err, blockNumber) => {
+      this.props.web3js.eth.getBlockNumber((err, blockNumber) => {
 
         let count = 0
 
@@ -340,11 +352,9 @@ class Main extends React.Component {
             })
         }
 
-        console.log('blockNumber', blockNumber)
-
         let callbackEvents = [
           {
-            event: this.props.contracts.store.IdentitySet,
+            event: this.props.contracts.twitterStore.IdentitySet,
             filter: {addr: appState.wallet},
             callback: () => {
               this.setGlobalState({subStep: 3}, {warn: null})
@@ -431,9 +441,11 @@ class Main extends React.Component {
           })
       })
     } else {
+      this.props.getEthInfo()
       this.setGlobalState({}, {
-        noGas: true,
-        err: 'Trying to load gas info. Wait a moment and try again, please.'
+        err: 'No ether and gas info found.',
+        errMessage: 'Reloading them. Try again in a moment.',
+        loading: false
       })
     }
   }
@@ -447,11 +459,12 @@ class Main extends React.Component {
 
     let welcomeMessage = ''
 
-    const ps = this.props.appState
+    const as = this.props.appState
+    const wallet = as.wallet
 
-    if (ps.connected !== -1) {
+    if (as.connected !== -1) {
 
-      const netId = ps.netId
+      const netId = as.netId
 
       if (netId == null) {
 
@@ -479,16 +492,13 @@ class Main extends React.Component {
             message="This alpha version supports only Ropsten."
           />
 
-      } else {
+      } else if (as.wallet) {
 
-        const state = ps.db[ps.wallet] || {
-          step: -1
-        }
+        const state = as.data[this.shortWallet()] || {step: -1}
 
+        if (state.twitter) {
 
-        if (ps.twitterUserId) {
-
-          //welcomeMessage = `Welcome back, ${ps.name.split(' ')[0]}`
+          //welcomeMessage = `Welcome back, ${as.name.split(' ')[0]}`
 
           return (
             <Grid>
@@ -499,54 +509,72 @@ class Main extends React.Component {
               </Row>
               <Row>
                 <Col md={6}>
-                  <p><img style={{borderRadius: 50}} src={ps.avatar} width="73" height="73"/></p>
-                  <p><b className="tname">{ps.name}</b><br/>
-                    <a href={'https://twitter.com/' + ps.userName}
-                       target="_blank">@{ps.userName}</a>
+                  <p><img style={{borderRadius: 50}} src={state.twitter.avatar} width="73" height="73"/></p>
+                  <p><b className="tname">{state.twitter.name}</b><br/>
+                    <a href={'https://twitter.com/' + state.twitter.username}
+                       target="_blank">@{state.twitter.username}</a>
                   </p>
-                  <p>Twitter user-id:<br/><code>{ps.twitterUserId}</code></p>
-                  <p>Address:<br/><code>{ps.wallet}</code></p>
+                  <p>Twitter user-id:<br/><code>{state.twitter.userId}</code></p>
+                  <p>Address:<br/><code>{wallet}</code></p>
                 </Col>
               </Row>
             </Grid>
           )
 
 
-        } else if (ps.wallet) {
+        } else if (as.wallet) {
 
 
           if (state.step === -1) {
 
-            return (
-              <Grid>
-                <Row>
-                  <Col md={12}>
-                    <h4 style={{paddingLeft: 15}}>Welcome</h4>
-                    <Panel>
-                      <Panel.Body>
+            if (as.ready) {
+              return (
+                <Grid>
+                  <Row>
+                    <Col md={12}>
+                      <h4 style={{paddingLeft: 15}}>Welcome</h4>
+                      <Panel>
+                        <Panel.Body>
 
-                        <p>
-                          Ready to set your tweedentity?
-                        </p>
-                        <p>
-                          <LoadingButton
-                            text="Yes, please"
-                            loadingText="Analyzing wallet"
-                            loading={state.loading}
-                            cmd={() => {
-                              this.getStats(ps)
-                            }}
-                          />
-                        </p>
+                          <p>
+                            Ready to set your tweedentity?
+                          </p>
+                          <p>
+                            <LoadingButton
+                              text="Yes, please"
+                              loadingText="Analyzing wallet"
+                              loading={as.loading}
+                              cmd={() => {
+                                this.getStats(as)
+                              }}
+                            />
+                          </p>
 
-                      </Panel.Body>
-                    </Panel>
-                  </Col>
-                </Row>
-              </Grid>
-            )
+                        </Panel.Body>
+                      </Panel>
+                    </Col>
+                  </Row>
+                </Grid>
+              )
+            } else {
+
+              return (
+                <Grid>
+                  <Row>
+                    <Col md={12}>
+                      <h4 style={{paddingLeft: 15}}>Welcome</h4>
+
+                      <Alert bsStyle="warning">
+                        <strong>Holy guacamole!</strong> The contracts are under maintenance. Come back later, please.
+                      </Alert>
+                    </Col>
+                  </Row>
+                </Grid>
+              )
+            }
 
           }
+
           if (state.step === 0) {
 
             const nextStep = <strong>Your wallet looks good.</strong>
@@ -569,7 +597,7 @@ class Main extends React.Component {
             const score = mainStats.txs + mainStats.deployes + mainStats.execs
             const cls = score < 3 ? 'primary' : score < 5 ? 'warning' : 'danger'
 
-            const minimum = '0.' + (1 / parseFloat(state.price)).toString().split('.')[1].substring(0, 4)
+            const minimum = '0.' + (1 / parseFloat(as.price, 10)).toString().split('.')[1].substring(0, 4)
 
             const lowBalance = <Alert bsStyle="danger">Balance too low. You need {minimum} ether to activate your
               tweedentity.</Alert>
@@ -586,7 +614,7 @@ class Main extends React.Component {
                     <Panel>
                       <Panel.Body>
                         <p><strong>Main Network</strong></p>
-                        <p>{this.formatStats(mainStats, '1', ps.wallet)}</p>
+                        <p>{this.formatStats(mainStats, '1', as.wallet)}</p>
                       </Panel.Body>
                     </Panel>
                   </Col>
@@ -594,13 +622,13 @@ class Main extends React.Component {
                     <Panel>
                       <Panel.Body>
                         <p><strong>Ropsten Network</strong></p>
-                        <p>{this.formatStats(ropstenStats, '3', ps.wallet)}</p>
+                        <p>{this.formatStats(ropstenStats, '3', as.wallet)}</p>
                       </Panel.Body></Panel>
                   </Col>
                 </Row>
                 <Row>
                   <Col md={12}>
-                    {ps.netId === '1' && mainStats.balance < minimum ? lowBalance : ''}
+                    {as.netId === '1' && mainStats.balance < minimum ? lowBalance : ''}
                     <Alert bsStyle={score < 3 ? 'info' : score < 5 ? 'warning' : 'danger'}>
                       <p>{
                         score < 3
@@ -637,7 +665,7 @@ class Main extends React.Component {
                         <form>
                           <FormGroup
                             controlId="formBasicText"
-                            validationState={state.err ? 'error' : this.getValidationState()}
+                            validationState={as.err ? 'error' : this.getValidationState()}
                           >
                             <ControlLabel>Which is your Twitter Username?</ControlLabel>
 
@@ -652,8 +680,8 @@ class Main extends React.Component {
                               <FormControl.Feedback/>
                             </InputGroup>
                             {
-                              state.err
-                                ? <HelpBlock>{state.err}</HelpBlock>
+                              as.err
+                                ? <HelpBlock>{as.err}</HelpBlock>
                                 : null
                             }
                           </FormGroup>
@@ -661,7 +689,7 @@ class Main extends React.Component {
                         <LoadingButton
                           text="Look up for Twitter user-id"
                           loadingText="Looking up"
-                          loading={state.loading}
+                          loading={as.loading}
                           cmd={this.getUserId}
                           disabled={this.getValidationState() !== 'success'}
                         />
@@ -705,9 +733,9 @@ class Main extends React.Component {
                           cryptographic signature of the following string, using your current Ethereum address:</p>
                         <p><code>{sigStr}</code></p>
                         {
-                          state.err
+                          as.err
                             ? <RedAlert
-                              message={state.err}
+                              message={as.err}
                             />
                             : ''
                         }
@@ -715,9 +743,9 @@ class Main extends React.Component {
                           <LoadingButton
                             text="Sign it now"
                             loadingText="Waiting for signature"
-                            loading={state.loading}
+                            loading={as.loading}
                             cmd={() => {
-                              this.signString(ps.web3js, ps.wallet, sigStr)
+                              this.signString(as.wallet, sigStr)
                             }}
                             disabled={this.getValidationState() !== 'success'}
                           />
@@ -755,7 +783,7 @@ class Main extends React.Component {
                           </FormGroup>
                         </form>
                         {
-                          state.err === 'User not found'
+                          as.err === 'User not found'
                             ? <RedAlert
                               title="Whoops"
                               message="The Twitter user has not been found. Very weird :-("
@@ -764,7 +792,7 @@ class Main extends React.Component {
                               }}
                               linkMessage="Input the username again"
                             />
-                            : state.err === 'Wrong tweet'
+                            : as.err === 'Wrong tweet'
                             ? <RedAlert
                               title="Whoops"
                               message="No tweet with a valid signature was found."
@@ -773,7 +801,7 @@ class Main extends React.Component {
                               }}
                               linkMessage="Input the username again"
                             />
-                            : state.err === 'Wrong signature'
+                            : as.err === 'Wrong signature'
                               ? <RedAlert
                                 title="Whoops"
                                 message="A tweet was found but with a wrong signature."
@@ -782,7 +810,7 @@ class Main extends React.Component {
                                 }}
                                 linkMessage="Input the username again"
                               />
-                              : state.err === 'Wrong user'
+                              : as.err === 'Wrong user'
                                 ? <RedAlert
                                   title="Whoops"
                                   message="A tweet with the right signature was found, but it was posted by someone else."
@@ -801,7 +829,7 @@ class Main extends React.Component {
                                   <LoadingButton
                                     text="I tweeted it, continue"
                                     loadingText="Finding the tweet"
-                                    loading={state.loading}
+                                    loading={as.loading}
                                     cmd={this.findTweet}
                                   />
                                 </p>
@@ -816,8 +844,8 @@ class Main extends React.Component {
             )
           } else if (state.step === 4) {
 
-            const price = parseFloat(state.price, 10)
-            const gasPrice = state.gasInfo.safeLow * 1e8
+            const price = parseFloat(as.price, 10)
+            const gasPrice = as.gasInfo.safeLow * 1e8
             const gasLimit = 185e3
 
             const cost = this.formatFloat(gasPrice * gasLimit / 1e18, 4)
@@ -828,8 +856,6 @@ class Main extends React.Component {
               gas: 255e3,
             }
 
-            const etherscanUrl = `https://${ps.netId === '3' ? 'ropsten.' : ''}etherscan.io/address/${ config.address[ps.env].claimer }`
-
             return (
               <Grid>
                 <Row>
@@ -838,31 +864,29 @@ class Main extends React.Component {
                     <Panel>
                       <Panel.Body>
                         <p><strong>All is ready</strong></p>
-                        <p>In the next step you will send {cost} ether (${cost$}) to the <a href={etherscanUrl}
-                                                                                            target="_blank">Tweedentity
-                          Smart Contract </a> to
+                        <p>In the next step you will send {cost} ether (${cost$}) to the Tweedentity Smart Contract to
                           cover the gas necessary to create your <em>tweedentity</em> in the Ethereum Blockchain. Be
                           adviced, after than you have created it, your Twitter user-id and your wallet will be publicly
                           associated.</p>
                         <p><span className="code">TwitterUserId:</span> <span
                           className="code success">{state.userId}</span><br/>
                           <span className="code">Wallet:</span> <span
-                            className="code success">{ps.wallet}</span>
+                            className="code success">{as.wallet}</span>
                         </p>
                         {
-                          state.err
+                          as.err
                             ? <RedAlert
-                              title={state.err}
-                              message="Please, try again in a while"
+                              title={as.err}
+                              message={as.errMessage}
                             />
                             : ''
                         }
                         <LoadingButton
-                          text={state.err ? 'Try again' : 'Create it now!'}
+                          text={as.err ? 'Try again' : 'Create it now!'}
                           loadingText="Starting transaction"
-                          loading={state.loading}
+                          loading={as.loading}
                           cmd={() => {
-                            this.startTransaction(ps)
+                            this.startTransaction(as)
                           }}
                         />
                       </Panel.Body>
@@ -874,7 +898,7 @@ class Main extends React.Component {
           } else if (state.step === 5) {
 
             let transaction = <a
-              href={'https://' + (ps.netId === '3' ? 'ropsten.' : '') + 'etherscan.io/tx/' + state.txHash}
+              href={'https://' + (as.netId === '3' ? 'ropsten.' : '') + 'etherscan.io/tx/' + state.txHash}
               target="_blank">transaction</a>
 
             return (
@@ -893,7 +917,7 @@ class Main extends React.Component {
                     <p><span className="mr12">
                     <LoadingBadge
                       text="2"
-                      loading={state.subStep < 2 && !state.err}
+                      loading={state.subStep < 2 && !as.err}
                     />
                   </span>
                       {
@@ -910,7 +934,7 @@ class Main extends React.Component {
                         ? <p><span className="mr12">
                       <LoadingBadge
                         text="3"
-                        loading={state.subStep < 3 && !state.err}
+                        loading={state.subStep < 3 && !as.err}
                       />
                       </span>
                           {
@@ -929,18 +953,18 @@ class Main extends React.Component {
                         : ''
                     }
                     {
-                      state.err
+                      as.err
                         ?
                         <RedAlert
                           title="Whoops"
-                          message={state.err}
+                          message={as.err}
                           link={() => {
                             this.setGlobalState({step: 4}, {err: null})
                           }}
                           linkMessage="Go back"
                         />
-                        : state.warn
-                        ? <Alert bsStyle="warning">{state.warn}</Alert>
+                        : as.warn
+                        ? <Alert bsStyle="warning">{as.warn}</Alert>
                         : ''
                     }
                   </Col>

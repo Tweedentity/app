@@ -7,16 +7,22 @@ class Header extends React.Component {
 
     let dropDown
 
-    let ps = this.props.appState
+    const ps = this.props.appState
+    const wallet = ps.wallet
+    let twitter
+    try {
+      twitter = ps.data[wallet.substring(0,6)].twitter
+    } catch (e) {
+    }
 
-    if (ps.address) {
+    if (wallet) {
 
-      if (ps.twitterUserId && ps.userName) {
-        dropDown = <NavDropdown eventKey={3} title={<img src={ps.avatar} className="tavatar circled"/>}
+      if (twitter) {
+        dropDown = <NavDropdown eventKey={3} title={<img src={twitter.avatar} className="tavatar circled"/>}
                                 id="basic-nav-dropdown">
           <li role="presentation">
-            <span><b className="tname">{ps.name}</b><br/>
-              @{ps.userName}</span>
+            <span><b className="tname">{twitter.name}</b><br/>
+              @{twitter.username}</span>
           </li>
           <MenuItem divider/>
           <MenuItem eventKey={3.1}>Settings</MenuItem>
@@ -24,7 +30,7 @@ class Header extends React.Component {
       } else {
         dropDown = <Nav>
           <NavItem eventKey={1} href="#">
-            {'Wallet ' + this.props.appState.address.substring(0, 6) + ' (anonymous)'}
+            {'Wallet ' + this.props.appState.wallet.substring(0, 6) + ' (anonymous)'}
           </NavItem>
         </Nav>
       }
@@ -34,10 +40,10 @@ class Header extends React.Component {
       <div>
         <NetworkStatus appState={this.props.appState}/>
         <Navbar
-            staticTop
-            componentClass="header"
-            className="bs-docs-nav"
-            role="banner"
+          staticTop
+          componentClass="header"
+          className="bs-docs-nav"
+          role="banner"
         >
           <Navbar.Header>
             <Navbar.Brand>

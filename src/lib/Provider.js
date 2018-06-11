@@ -339,9 +339,15 @@ class Provider {
 
     const key = `abi:${network}:${address}`
     return db.getAsync(key)
-      .then(abi => {
-        if (abi && false) {
-          return Promise.resolve([address, JSON.parse(abi)])
+      .then(abiJson => {
+
+        let abi
+        try {
+          abi = JSON.parse(abiJson)
+        } catch(err) {
+        }
+        if (abi) {
+          return Promise.resolve([address, abi])
         } else {
 
           const url = `http://api${network == '3' ? '-ropsten' : ''}.etherscan.io/api?module=contract&action=getabi&address=${address}&apikey=${etherscanApiKey}`
@@ -349,9 +355,14 @@ class Provider {
           return request
             .get(url)
             .then(res => {
-              abi = res.body.result
-              db.set(key, abi)
-              return Promise.resolve([address, JSON.parse(abi)])
+              abiJson = res.body.result
+              try {
+                abi = JSON.parse(abiJson)
+                db.set(key, abiJson)
+                return Promise.resolve([address, abi])
+              } catch(err) {
+                return Promise.resolve([address, []])
+              }
             })
         }
       })

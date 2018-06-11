@@ -1,7 +1,7 @@
 module.exports = {
   registry: {
     address: {
-      ropsten: "0x936bf891cc023a685bc18f0a97059f2b0132e044",
+      ropsten: "0x8938ccca99715104937e7fe501e3a572afb53212",
       main: ""
     },
     abi: [
@@ -39,15 +39,6 @@ module.exports = {
         "type": "function"
       },
       {
-        "constant": false,
-        "inputs": [],
-        "name": "unpause",
-        "outputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
         "constant": true,
         "inputs": [],
         "name": "manager",
@@ -64,11 +55,11 @@ module.exports = {
       {
         "constant": true,
         "inputs": [],
-        "name": "paused",
+        "name": "claimerKey",
         "outputs": [
           {
             "name": "",
-            "type": "bool"
+            "type": "bytes32"
           }
         ],
         "payable": false,
@@ -76,12 +67,17 @@ module.exports = {
         "type": "function"
       },
       {
-        "constant": false,
+        "constant": true,
         "inputs": [],
-        "name": "pause",
-        "outputs": [],
+        "name": "storeKey",
+        "outputs": [
+          {
+            "name": "",
+            "type": "bytes32"
+          }
+        ],
         "payable": false,
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
         "type": "function"
       },
       {
@@ -92,6 +88,20 @@ module.exports = {
           {
             "name": "",
             "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "managerKey",
+        "outputs": [
+          {
+            "name": "",
+            "type": "bytes32"
           }
         ],
         "payable": false,
@@ -127,21 +137,25 @@ module.exports = {
         "type": "function"
       },
       {
-        "inputs": [],
-        "payable": false,
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-      },
-      {
         "anonymous": false,
-        "inputs": [],
-        "name": "Pause",
-        "type": "event"
-      },
-      {
-        "anonymous": false,
-        "inputs": [],
-        "name": "Unpause",
+        "inputs": [
+          {
+            "indexed": true,
+            "name": "key",
+            "type": "bytes32"
+          },
+          {
+            "indexed": false,
+            "name": "spec",
+            "type": "string"
+          },
+          {
+            "indexed": false,
+            "name": "addr",
+            "type": "address"
+          }
+        ],
+        "name": "ContractRegistered",
         "type": "event"
       },
       {
@@ -165,7 +179,7 @@ module.exports = {
         "constant": false,
         "inputs": [
           {
-            "name": "_address",
+            "name": "_manager",
             "type": "address"
           }
         ],
@@ -179,7 +193,7 @@ module.exports = {
         "constant": false,
         "inputs": [
           {
-            "name": "_address",
+            "name": "_claimer",
             "type": "address"
           }
         ],
@@ -215,11 +229,11 @@ module.exports = {
             "type": "string"
           },
           {
-            "name": "_address",
+            "name": "_store",
             "type": "address"
           }
         ],
-        "name": "setStore",
+        "name": "setAStore",
         "outputs": [],
         "payable": false,
         "stateMutability": "nonpayable",
@@ -262,10 +276,24 @@ module.exports = {
   },
   twitterStore: {
     address: {
-      ropsten: '0xe5277b95e1d4dbc9183686deee59619779005e85',
+      ropsten: '0x556331fcce1ca29e946283c74e5c65eff15dd29e',
       main: ''
     },
     abi: [
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "newManager",
+        "outputs": [
+          {
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
       {
         "constant": true,
         "inputs": [],
@@ -297,6 +325,20 @@ module.exports = {
       {
         "constant": true,
         "inputs": [],
+        "name": "appId",
+        "outputs": [
+          {
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
         "name": "owner",
         "outputs": [
           {
@@ -311,37 +353,11 @@ module.exports = {
       {
         "constant": true,
         "inputs": [],
-        "name": "app",
-        "outputs": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "domain",
-            "type": "string"
-          },
-          {
-            "name": "nickname",
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "type": "uint256"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "managerAddress",
+        "name": "appNickname",
         "outputs": [
           {
             "name": "",
-            "type": "address"
+            "type": "string"
           }
         ],
         "payable": false,
@@ -380,7 +396,7 @@ module.exports = {
         "anonymous": false,
         "inputs": [
           {
-            "indexed": false,
+            "indexed": true,
             "name": "addr",
             "type": "address"
           },
@@ -397,7 +413,7 @@ module.exports = {
         "anonymous": false,
         "inputs": [
           {
-            "indexed": false,
+            "indexed": true,
             "name": "addr",
             "type": "address"
           },
@@ -445,19 +461,34 @@ module.exports = {
         "constant": false,
         "inputs": [
           {
-            "name": "_name",
+            "name": "_address",
+            "type": "address"
+          }
+        ],
+        "name": "setNewManager",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [],
+        "name": "switchManagerAndRemoveOldOne",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "_appNickname",
             "type": "string"
           },
           {
-            "name": "_domain",
-            "type": "string"
-          },
-          {
-            "name": "_nickname",
-            "type": "string"
-          },
-          {
-            "name": "_id",
+            "name": "_appId",
             "type": "uint256"
           }
         ],
@@ -465,44 +496,6 @@ module.exports = {
         "outputs": [],
         "payable": false,
         "stateMutability": "nonpayable",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_uid",
-            "type": "string"
-          }
-        ],
-        "name": "isUidSet",
-        "outputs": [
-          {
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
-        "type": "function"
-      },
-      {
-        "constant": true,
-        "inputs": [
-          {
-            "name": "_address",
-            "type": "address"
-          }
-        ],
-        "name": "isAddressSet",
-        "outputs": [
-          {
-            "name": "",
-            "type": "bool"
-          }
-        ],
-        "payable": false,
-        "stateMutability": "view",
         "type": "function"
       },
       {

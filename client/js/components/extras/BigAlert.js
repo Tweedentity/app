@@ -1,11 +1,11 @@
 const {Alert, Button} = ReactBootstrap
 
-class RedAlert extends React.Component {
+class BigAlert extends React.Component {
 
   render() {
 
     return (
-    <Alert bsStyle="danger">
+    <Alert bsStyle={this.props.bsStyle || 'danger'}>
       {
         this.props.title
         ? <h4><i className="fa fa-exclamation-triangle mr4"></i>
@@ -34,4 +34,4 @@ typeof this.props.link === 'string'
 
 }
 
-export default RedAlert
+export default BigAlert

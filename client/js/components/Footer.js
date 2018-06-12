@@ -33,10 +33,22 @@ class Footer extends Basic {
           <Row>
             <Col md={12}>
               <div className="centered level1">
-                <span className="item" target="_blank" href="#">
+                <span className="item" onClick={()=>{
+                  this.setGlobalState({}, {
+                    show: true,
+                    modalTitle: 'Whoops',
+                    modalBody: 'This link will be activated soon.'
+                  })
+                }}>
                   <i className="fa fa-dot-circle-o"></i> Terms and Conditions
                 </span>
-                <span className="item" target="_blank" href="#">
+                <span className="item" onClick={()=>{
+                  this.setGlobalState({}, {
+                    show: true,
+                    modalTitle: 'Whoops',
+                    modalBody: 'This link will be activated soon.'
+                  })
+                }}>
                   <i className="fa fa-user-secret"></i> Privacy
                 </span>
                 <a className="item">|</a>

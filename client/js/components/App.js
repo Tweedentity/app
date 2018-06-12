@@ -3,6 +3,8 @@ import createHistory from "history/createBrowserHistory"
 const history = createHistory()
 const config = require('../config')
 
+const {Modal, Button} = ReactBootstrap
+
 const Db = require('../utils/Db')
 
 import Header from './Header'
@@ -45,7 +47,9 @@ class App extends React.Component {
       'setAppState',
       'getEthInfo',
       'getContracts',
-      'callMethod'
+      'callMethod',
+      'handleClose',
+      'handleShow'
     ]) {
       this[m] = this[m].bind(this)
     }
@@ -312,6 +316,14 @@ class App extends React.Component {
     }
   }
 
+  handleClose() {
+    this.setState({ show: false });
+  }
+
+  handleShow() {
+    this.setState({ show: true });
+  }
+
   render() {
 
     const app = {
@@ -351,6 +363,21 @@ class App extends React.Component {
         <Header app={app}/>
         {component}
         <Footer app={app} />
+        { this.state.show
+        ? <Modal.Dialog>
+          <Modal.Header>
+            <Modal.Title>{this.state.modalTitle}</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>{this.state.modalBody}</Modal.Body>
+
+          <Modal.Footer>
+            <Button onClick={()=> {
+            this.setState({show: false})
+            }}>{this.state.modalClose || 'Close'}</Button>
+          </Modal.Footer>
+        </Modal.Dialog>
+          : null}
       </div>
     )
   }

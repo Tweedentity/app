@@ -66,7 +66,13 @@ class Account extends Basic {
           <div className="account">
             <i className={`fa fa-${this.props.icon} appIcon`}></i>
             { this.props.active && this.props.userId
-              ? <i className="fa fa-cog settingsIcon"></i>
+              ? <i className="fa fa-cog settingsIcon" onClick={()=>{
+                this.setGlobalState({}, {
+                  show: true,
+                  modalTitle: 'Whoops',
+                  modalBody: 'This command will be activated soon.'
+                })
+              }}></i>
             : null}
             {content}
           </div>

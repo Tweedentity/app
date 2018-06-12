@@ -8,7 +8,6 @@ class EventWatcher {
   }
 
   stop() {
-    console.log('stopping')
     if (this.events) {
       try {
         for (e in this.events) {
@@ -17,7 +16,6 @@ class EventWatcher {
       } catch (err) {
       }
       this.events = null
-      console.log('stopped')
     }
   }
 
@@ -31,9 +29,6 @@ class EventWatcher {
 
     for (let event of events) {
       (function (e) {
-
-        console.log(e)
-
         self.events[index] = e.event(e.filter || {}, {
           fromBlock: e.fromBlock,
           toBlock: e.toBlock || 'latest'

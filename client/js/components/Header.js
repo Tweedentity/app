@@ -1,13 +1,28 @@
 const {Nav, NavItem, NavDropdown, MenuItem, Navbar} = ReactBootstrap
 import NetworkStatus from './NetworkStatus'
+import Basic from './Basic'
 
-class Header extends React.Component {
+class Header extends Basic {
+
+
+  constructor(props) {
+    super(props)
+
+    this.execCommand = this.execCommand.bind(this)
+  }
+
+
+  execCommand(key) {
+    if (key === 2) {
+      this.historyPush('profile')
+    }
+  }
 
   render() {
 
     let dropDown
 
-    const ps = this.props.appState
+    const ps = this.appState()
     const wallet = ps.wallet
     let twitter
     try {
@@ -17,20 +32,20 @@ class Header extends React.Component {
 
     if (wallet) {
 
-      if (twitter) {
+      if (twitter && twitter.name) {
         dropDown = <NavDropdown eventKey={3} title={<img src={twitter.avatar} className="tavatar circled"/>}
-                                id="basic-nav-dropdown">
+                                id="basic-nav-dropdown" onSelect={this.execCommand}>
           <li role="presentation">
             <span><b className="tname">{twitter.name}</b><br/>
               @{twitter.username}</span>
           </li>
-          <MenuItem divider/>
-          <MenuItem eventKey={3.1}>Settings</MenuItem>
+          {/*<MenuItem divider/>*/}
+          {/*<MenuItem eventKey={2}>Profile</MenuItem>*/}
         </NavDropdown>
       } else {
         dropDown = <Nav>
           <NavItem eventKey={1} href="#">
-            {'Wallet ' + this.props.appState.wallet.substring(0, 6) + ' (anonymous)'}
+            {'Wallet ' + this.appState().wallet.substring(0, 6) + ' (anonymous)'}
           </NavItem>
         </Nav>
       }
@@ -38,7 +53,7 @@ class Header extends React.Component {
 
     return (
       <div>
-        <NetworkStatus appState={this.props.appState}/>
+        <NetworkStatus appState={this.props.app.appState}/>
         <Navbar
           staticTop
           componentClass="header"

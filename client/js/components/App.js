@@ -1,12 +1,20 @@
 import createHistory from "history/createBrowserHistory"
 
-const history = window.History = createHistory()
+const history = createHistory()
 const config = require('../config')
 
 const Db = require('../utils/Db')
 
 import Header from './Header'
-import Main from './Main'
+import Footer from './Footer'
+import Unconnected from "./Unconnected"
+import Welcome from "./Welcome"
+import WalletStats from "./WalletStats"
+import GetUsername from './GetUsername'
+import UserIdFound from './UserIdFound'
+import Signed from './Signed'
+import Create from './Create'
+import SectionNotFound from './SectionNotFound'
 
 class App extends React.Component {
 
@@ -27,24 +35,34 @@ class App extends React.Component {
       err: null,
       loading: false,
       data: this.db.data,
-      ready: false
+      sections: {}
     }
 
     for (let m of [
-      'getNetwork', 'watchAccounts0', 'getAccounts', 'setAppState', 'getEthInfo', 'getContracts'
+      'getNetwork',
+      'watchAccounts0',
+      'getAccounts',
+      'setAppState',
+      'getEthInfo',
+      'getContracts',
+      'callMethod'
     ]) {
       this[m] = this[m].bind(this)
     }
 
+    this.getNetwork()
+
+  }
+
+  componentDidMount() {
     history.listen(location => {
       this.setState({
         hash: location.hash
       })
     })
-
-    history.push('#/welcome')
-    this.getNetwork()
-
+    this.historyPush({
+      section: 'connecting'
+    })
   }
 
   getNetwork() {
@@ -78,23 +96,28 @@ class App extends React.Component {
 
         if (env) {
 
-          const registry = this.web3js.eth.contract(config.registry.abi).at(config.registry.address[env])
-          const twitterStore = this.web3js.eth.contract(config.twitterStore.abi).at(config.twitterStore.address[env])
-
-          this.contracts = {
-            registry,
-            twitterStore
-          }
-
           this.setState({
             netId,
             connected: 1,
             env
           })
-          this.watchAccounts0()
-          setInterval(this.watchAccounts0, 1000)
-          this.getEthInfo()
-          this.getContracts()
+
+          if (env === 'ropsten') {
+
+            const registry = this.web3js.eth.contract(config.registry.abi).at(config.registry.address[env])
+            const twitterStore = this.web3js.eth.contract(config.twitterStore.abi).at(config.twitterStore.address[env])
+
+            this.contracts = {
+              registry,
+              twitterStore
+            }
+            this.watchAccounts0()
+            setInterval(this.watchAccounts0, 1000)
+            this.getEthInfo()
+            this.getContracts()
+
+          }
+
         }
 
       })
@@ -120,6 +143,8 @@ class App extends React.Component {
           registry.claimer((err, result) => {
             claimer = result
 
+            console.log(manager, claimer)
+
             return fetch(window.location.origin + '/api/contract-abi?r=' + Math.random(), {
               method: 'POST',
               headers: {
@@ -132,7 +157,7 @@ class App extends React.Component {
                   manager,
                   claimer
                 ]
-              }),
+              })
             })
               .then((response) => response.json())
               .then((responseJson) => {
@@ -141,20 +166,21 @@ class App extends React.Component {
                   this.contracts[key] = this.web3js.eth.contract(j[1]).at(j[0])
                 }
                 this.setState({
-                  ready: true
+                  ready: true,
+                  claimer
                 })
 
               })
               .catch(err => {
                 console.log(err)
-                // this.setGlobalState({}, {
-                //   err: 'User not found',
-                //   loading: false
-                // })
               })
           })
         })
 
+      } else {
+        this.setState({
+          ready: false
+        })
       }
 
     })
@@ -163,20 +189,25 @@ class App extends React.Component {
 
   getEthInfo() {
     return fetch(window.location.origin + '/api/eth-info?r=' + Math.random(), {
-      method: 'GET',
+      method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-      }
+      },
+      body: JSON.stringify({
+        network: this.state.netId
+      })
     })
       .then((response) => response.json())
       .then((responseJson) => {
         this.setState(responseJson)
       })
       .catch(err => {
-        this.setState({
-          noEthInfo: true
-        })
+        if (!this.state.price) {
+          this.setState({
+            noEthInfo: true
+          })
+        }
       })
   }
 
@@ -187,17 +218,22 @@ class App extends React.Component {
         wallet
       })
       let shortWallet = wallet.substring(0, 6)
-      if (!this.state.data[shortWallet] || typeof this.state.data[shortWallet].step === 'undefined') {
-        this.db.put(shortWallet, {step: -1})
+      if (!this.state.data[shortWallet]) {
+        this.db.put(shortWallet, {})
       }
       this.getAccounts()
+      if (this.state.hash === '#/connecting') {
+        this.historyPush({
+          section: 'welcome',
+          replace: true
+        })
+      }
     }
   }
 
   getAccounts() {
 
     if (this.state.wallet) {
-
 
       let shortWallet = this.state.wallet.substring(0, 6)
       this.contracts.twitterStore.getUid(this.state.wallet, (err, result) => {
@@ -213,20 +249,20 @@ class App extends React.Component {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
+                network: this.state.netId,
                 userId
               })
             }).then(response => {
               return response.json()
             }).then(json => {
               const {name, username, avatar} = json.result
-              this.db.put(shortWallet, {
+              this.db.set(shortWallet, {
                 twitter: {
                   userId,
                   name,
                   username,
                   avatar
-                },
-                step: -1
+                }
               })
             }).catch(function (ex) {
               console.log('parsing failed', ex)
@@ -234,7 +270,7 @@ class App extends React.Component {
           }
         } else {
           this.db.put(shortWallet, {
-            twitter: null
+            twitter: {}
           })
         }
       })
@@ -245,22 +281,76 @@ class App extends React.Component {
     this.setState(states)
   }
 
+  historyBack() {
+    history.back()
+  }
+
+  historyPush(args) {
+    const shortWallet = (this.state.wallet || '0x0000').substring(0, 6)
+    const sections = this.state.sections
+    if (!sections[shortWallet]) {
+      sections[shortWallet] = {}
+    }
+    sections[shortWallet][args.section] = true
+    this.setState({sections})
+    history[
+      args.replace ? 'replace' : 'push'
+      ](`#/${args.section}`)
+  }
+
+  callMethod(method, args) {
+    if ([
+      'historyPush',
+      'historyBack',
+      'setAppState',
+      'getEthInfo',
+      'getAccounts'
+    ].indexOf(method) !== -1) {
+      this[method](args || {})
+    } else {
+      console.error(`Method ${method} not allowed.`)
+    }
+  }
+
   render() {
+
+    const app = {
+      appState: this.state,
+      callMethod: this.callMethod,
+      db: this.db,
+      web3js: this.web3js,
+      contracts: this.contracts,
+      history
+    }
+    let hash = this.state.hash
+    let component = <SectionNotFound app={app}/>
+
+    if (!hash || hash === '#/connecting') {
+      component = <Unconnected app={app}/>
+    } else if (this.state.wallet) {
+      const sections = this.state.sections[this.state.wallet.substring(0, 6)] || {}
+      if (hash === '#/welcome' || sections[hash.substring(2)]) {
+        if (hash === '#/welcome') {
+          component = <Welcome app={app}/>
+        } else if (hash === '#/wallet-stats') {
+          component = <WalletStats app={app}/>
+        } else if (hash === '#/get-username') {
+          component = <GetUsername app={app}/>
+        } else if (hash === '#/userid-found') {
+          component = <UserIdFound app={app}/>
+        } else if (hash === '#/signed') {
+          component = <Signed app={app}/>
+        } else if (hash === '#/create') {
+          component = <Create app={app}/>
+        }
+      }
+    }
 
     return (
       <div>
-        <Header
-          appState={this.state}
-        />
-        <Main
-          appState={this.state}
-          getAccounts={this.getAccounts}
-          db={this.db}
-          setAppState={this.setAppState}
-          web3js={this.web3js}
-          contracts={this.contracts}
-          getEthInfo={this.getEthInfo}
-        />
+        <Header app={app}/>
+        {component}
+        <Footer app={app} />
       </div>
     )
   }

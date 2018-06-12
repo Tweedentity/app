@@ -6,8 +6,11 @@ html,
 body {
     background-color: #fff;
     color: #0B1122;
-    font-family: 'Lato';
     background: url(../img/background2.png) repeat-y;
+}
+
+a {
+    color: #17AFD0 !important;
 }
 
 .overHeader {
@@ -70,4 +73,59 @@ span.danger {
 
 .spacer {
     margin: 6px;
+}
+
+
+.footer {
+    margin-top: 100px;
+    border-top: 1px solid #edfafc;
+}
+
+.footer a.item {
+    padding: 0 12px;
+}
+
+.footer span.item {
+    padding: 0 12px;
+    color: #17AFD0;
+}
+
+.centered {
+    text-align: center;
+}
+
+.level0 {
+    margin: 24px 0 0;
+}
+
+.level1 {
+    margin: 18px 0 0;
+}
+
+.level2 {
+    margin: 64px;
+}
+
+div.account {
+    padding: 42px 0 4px;
+    text-align: center;
+}
+
+div.account .appIcon {
+    font-size: 32px;
+    position: absolute;
+    top: 10px;
+    left: 33px;
+}
+
+div.account .settingsIcon {
+    position: absolute;
+    top: 14px;
+    right: 27px;
+    font-size: 18px;
+    color: #17AFD0;
+}
+
+p.user-data {
+    padding: 20px 0px 8px;
 }

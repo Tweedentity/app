@@ -34,7 +34,7 @@ class Db {
     }
   }
 
-  clear(key, val) {
+  set(key, val) {
     try {
       if (val) {
         this.data[key] = val

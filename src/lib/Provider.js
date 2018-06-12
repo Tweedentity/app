@@ -2,28 +2,24 @@ const db = require('./db').redis
 const _ = require('lodash')
 const Web3 = require('web3')
 const request = require('superagent')
-const gasUrl = 'https://ethgasstation.info/json/ethgasAPI.json'
 const fs = require('./fs')
 const path = require('path')
 const cheerio = require('cheerio')
 
-const web3 = new Web3(new Web3.providers.HttpProvider('https://mainnet.infura.io/' + process.env.INFURA_KEY))
-
 const etherscanApiKey = process.env.ETHERSCAN_TWEEDENTITY_API_KEY
 
-const config = require('../../client/js/config')
+let web3
 
 class Provider {
 
-  constructor() {
+  constructor(network) {
 
-
+    web3 = new Web3(new Web3.providers.HttpProvider(`https://${network === '3' ? 'ropsten' : 'mainnet'}.infura.io/${ process.env.INFURA_KEY}`))
   }
 
   getApiUrl(action, network, address, startBlock) {
     return `http://api${network == '3' ? '-ropsten' : ''}.etherscan.io/api?module=account&action=${action}&address=${address}&startblock=${startBlock || '0'}&endblock=99999999&sort=asc&apikey=${etherscanApiKey}`
   }
-
 
   gethEtherPrice() {
     return db.getAsync('etherPrice')
@@ -339,9 +335,15 @@ class Provider {
 
     const key = `abi:${network}:${address}`
     return db.getAsync(key)
-      .then(abi => {
-        if (abi && false) {
-          return Promise.resolve([address, JSON.parse(abi)])
+      .then(abiJson => {
+
+        let abi
+        try {
+          abi = JSON.parse(abiJson)
+        } catch (err) {
+        }
+        if (abi) {
+          return Promise.resolve([address, abi])
         } else {
 
           const url = `http://api${network == '3' ? '-ropsten' : ''}.etherscan.io/api?module=contract&action=getabi&address=${address}&apikey=${etherscanApiKey}`
@@ -349,9 +351,14 @@ class Provider {
           return request
             .get(url)
             .then(res => {
-              abi = res.body.result
-              db.set(key, abi)
-              return Promise.resolve([address, JSON.parse(abi)])
+              abiJson = res.body.result
+              try {
+                abi = JSON.parse(abiJson)
+                db.set(key, abiJson)
+                return Promise.resolve([address, abi])
+              } catch (err) {
+                return Promise.resolve([address, []])
+              }
             })
         }
       })
@@ -359,4 +366,4 @@ class Provider {
   }
 }
 
-module.exports = new Provider
+module.exports = Provider

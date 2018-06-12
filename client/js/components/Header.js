@@ -62,7 +62,10 @@ class Header extends Basic {
         >
           <Navbar.Header>
             <Navbar.Brand>
-              <img src="img/tweedentity-full-logo-w-ico.png" style={{marginTop: -1}}/>
+              <img src="img/tweedentity-full-logo-w-ico.png" style={{
+                marginTop: -1,
+              cursor: 'pointer'}}
+              />
             </Navbar.Brand>
             <Navbar.Toggle/>
           </Navbar.Header>

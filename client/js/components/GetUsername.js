@@ -18,16 +18,16 @@ class GetUsername extends Basic {
   }
 
   getValidationState() {
-    if (/^[a-zA-Z0-9_]{1,15}$/.test(this.getGlobalState('screenName'))) {
+    if (/^[a-zA-Z0-9_]{1,15}$/.test(this.getGlobalState('username'))) {
       return 'success'
-    } else if (this.getGlobalState('screenName').length > 0) {
+    } else if (this.getGlobalState('username').length > 0) {
       return 'error'
     }
     return null
   }
 
   handleChange(e) {
-    this.setGlobalState({screenName: e.target.value}, {err: null})
+    this.setGlobalState({username: e.target.value}, {err: null})
   }
 
   getUserId() {
@@ -42,7 +42,7 @@ class GetUsername extends Basic {
       },
       body: JSON.stringify({
         network: this.appState().netId,
-        screenName: this.getGlobalState('screenName')
+        username: this.getGlobalState('username')
       }),
     })
       .then((response) => response.json())
@@ -51,7 +51,7 @@ class GetUsername extends Basic {
 
         if (r.sn) {
           this.setGlobalState({
-            screenName: r.sn,
+            username: r.sn,
             userId: r.userId,
             name: r.name,
             avatar: r.avatar

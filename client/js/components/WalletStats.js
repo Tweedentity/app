@@ -36,11 +36,19 @@ class WalletStats extends Basic {
     const notGood = <strong>Whoops, you did many transactions with this wallet.</strong>
     const veryBad = <strong>Be careful, you did a lot of transactions with this wallet.</strong>
 
+    let bestPractice = <span>The best
+      practice is to set a new wallet and send a minimum amount of ether to it using an exchange like <a
+        href="https://shapeshift.io/" target="_blank">ShapeShift</a> or a mixer like <a
+        href="https://www.eth-mixer.com/" target="_blank">ETH-Mixer</a>.</span>
+
+    if (as.env === 'ropsten') {
+      bestPractice = <span>The best
+      practice is to set a new wallet and requeste a few ether at <a
+          href="https://faucet.metamask.io/" target="_blank">MetaMask Ether Faucet</a>.</span>
+    }
+
     const weSuggest = <p>For your privacy, we suggest you use a wallet with almost no transactions to /from any
-      other wallet. After that you have set your tweedentity, anyone could see all your transactions. The best
-      practice is to create a new wallet and send a minimum amount of ether to it using an exchange like <a
-        href="https://https://shapeshift.io/" target="_blank">ShapeShift</a> or a mixer like <a
-        href="https://www.eth-mixer.com/" target="_blank">ETH-Mixer</a>.</p>
+      other wallet. After that you have set your tweedentity, anyone could see all your transactions. {bestPractice}</p>
 
     const moreInfo = ''
     // <p>Read more about privacy issues and how to solve them <a href="#" target="_blank">here</a>.</p>

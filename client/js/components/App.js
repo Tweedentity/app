@@ -1,6 +1,6 @@
 import createHistory from "history/createBrowserHistory"
 
-const history = createHistory()
+const history = window.History = createHistory()
 const config = require('../config')
 
 const {Modal, Button} = ReactBootstrap
@@ -15,8 +15,10 @@ import WalletStats from "./WalletStats"
 import GetUsername from './GetUsername'
 import UserIdFound from './UserIdFound'
 import Signed from './Signed'
-import Create from './Create'
+import Set from './Set'
 import SectionNotFound from './SectionNotFound'
+import ManageAccount from './ManageAccount'
+import Unset from './Unset'
 
 class App extends React.Component {
 
@@ -72,7 +74,7 @@ class App extends React.Component {
   getNetwork() {
 
     if (typeof web3 !== 'undefined') {
-      console.log('Using web3 detected from external source like Metamask')
+      console.log('Using web3 detected from external source like MetaMask')
 
       this.web3js = new Web3(web3.currentProvider)
       this.web3js.eth.getTransactionReceiptMined = require("../utils/getTransactionReceiptMined")
@@ -171,6 +173,7 @@ class App extends React.Component {
                 }
                 this.setState({
                   ready: true,
+                  manager,
                   claimer
                 })
 
@@ -352,8 +355,12 @@ class App extends React.Component {
           component = <UserIdFound app={app}/>
         } else if (hash === '#/signed') {
           component = <Signed app={app}/>
-        } else if (hash === '#/create') {
-          component = <Create app={app}/>
+        } else if (hash === '#/set') {
+          component = <Set app={app}/>
+        } else if (hash === '#/manage-account') {
+          component = <ManageAccount app={app}/>
+        } else if (hash === '#/unset') {
+          component = <Unset app={app}/>
         }
       }
     }

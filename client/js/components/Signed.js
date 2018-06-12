@@ -33,7 +33,7 @@ class Signed extends Basic {
       },
       body: JSON.stringify({
         network: this.appState().netId,
-        screenName: this.getGlobalState('screenName'),
+        username: this.getGlobalState('username'),
         sig: this.getGlobalState('tweet')
       }),
     })
@@ -51,7 +51,7 @@ class Signed extends Basic {
           }, {
             loading: false
           })
-          this.historyPush('create')
+          this.historyPush('set')
         } else {
           throw(new Error('Not found'))
         }

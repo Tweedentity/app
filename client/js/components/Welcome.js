@@ -51,7 +51,17 @@ class Welcome extends Basic {
 
     const state = as.data[this.shortWallet()]
 
+    let userId
+    let twitter = {}
+    try {
+      userId = state.twitter.userId
+      twitter = state.twitter
+    } catch(e) {
+
+    }
+
     if (typeof state.twitter === 'object') {
+
 
       return (
         <Grid>
@@ -59,7 +69,7 @@ class Welcome extends Basic {
             <Col md={12}>
               <h4 style={{textAlign: 'center', marginBottom: 48}}>
                 {
-                  state.twitter.username
+                  userId
                   ? 'Welcome back ' : 'Welcome '
                 } {as.wallet}</h4>
             </Col>
@@ -69,11 +79,11 @@ class Welcome extends Basic {
               <Account
                 app={this.props.app}
                 icon="twitter"
-                name={state.twitter.name}
-                username={state.twitter.username}
-                userId={state.twitter.userId}
-                decoratedUsername={'@' + state.twitter.name}
-                avatar={state.twitter.avatar}
+                name={twitter.name}
+                username={twitter.username}
+                userId={twitter.userId}
+                decoratedUsername={'@' + twitter.name}
+                avatar={twitter.avatar}
                 active={true}
                 getStats={() => {
                   this.getStats(as)

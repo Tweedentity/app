@@ -23,7 +23,6 @@ class ManageAccount extends Basic {
     this.checkUpgradability()
   }
 
-
   checkUpgradability() {
     const wallet = this.appState().wallet
     const userId = this.getGlobalState('twitter').userId
@@ -52,12 +51,14 @@ class ManageAccount extends Basic {
           })
         })
       }
-
-
     })
   }
 
   componentDidMount() {
+    this.setGlobalState({
+      started: false,
+      step: 0
+    })
     if (this.web3js) {
       this.watcher = new EventWatcher(this.web3js)
       const checkState = () => {

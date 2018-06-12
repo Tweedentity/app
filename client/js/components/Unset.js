@@ -21,8 +21,8 @@ class Unset extends Basic {
 
   goHome() {
     this.db.set(this.shortWallet(), {})
-    this.props.app.history.go(-2)
     this.props.app.callMethod('getAccounts')
+    this.historyPush('welcome')
   }
 
   componentDidMount() {
@@ -273,7 +273,11 @@ class Unset extends Basic {
                     message={as.err}
                     link={() => {
                       this.setGlobalState({}, {err: null})
-                      this.props.app.callMethod('historyBack')
+                      this.setGlobalState({
+                        started: false,
+                        step: 0
+                      })
+                      this.historyPush('manage-account')
                     }}
                     linkMessage="Go back"
                   />

@@ -1,7 +1,7 @@
 module.exports = {
   registry: {
     address: {
-      ropsten: "0x8938ccca99715104937e7fe501e3a572afb53212",
+      ropsten: "0x4454742Cb8F831C4ACA2BcA883a41f06DAFdA444",
       main: ""
     },
     abi: [
@@ -69,6 +69,20 @@ module.exports = {
       {
         "constant": true,
         "inputs": [],
+        "name": "version",
+        "outputs": [
+          {
+            "name": "",
+            "type": "string"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
         "name": "storeKey",
         "outputs": [
           {
@@ -92,6 +106,15 @@ module.exports = {
         ],
         "payable": false,
         "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [],
+        "name": "reclaimEther",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
         "type": "function"
       },
       {
@@ -135,6 +158,11 @@ module.exports = {
         "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
+      },
+      {
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "fallback"
       },
       {
         "anonymous": false,
@@ -276,7 +304,7 @@ module.exports = {
   },
   twitterStore: {
     address: {
-      ropsten: '0x556331fcce1ca29e946283c74e5c65eff15dd29e',
+      ropsten: '0xdbca62E3d07cfE032468A04324d53729aaF7F0A3',
       main: ''
     },
     abi: [
@@ -302,6 +330,20 @@ module.exports = {
           {
             "name": "",
             "type": "address"
+          }
+        ],
+        "payable": false,
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "constant": true,
+        "inputs": [],
+        "name": "version",
+        "outputs": [
+          {
+            "name": "",
+            "type": "string"
           }
         ],
         "payable": false,
@@ -351,6 +393,15 @@ module.exports = {
         "type": "function"
       },
       {
+        "constant": false,
+        "inputs": [],
+        "name": "reclaimEther",
+        "outputs": [],
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
         "constant": true,
         "inputs": [],
         "name": "appNickname",
@@ -393,6 +444,11 @@ module.exports = {
         "type": "function"
       },
       {
+        "payable": false,
+        "stateMutability": "nonpayable",
+        "type": "fallback"
+      },
+      {
         "anonymous": false,
         "inputs": [
           {
@@ -423,7 +479,7 @@ module.exports = {
             "type": "string"
           }
         ],
-        "name": "IdentityRemoved",
+        "name": "IdentityUnset",
         "type": "event"
       },
       {

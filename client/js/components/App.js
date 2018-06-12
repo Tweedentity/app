@@ -141,6 +141,10 @@ class App extends React.Component {
     let manager
     let claimer
 
+    this.setState({
+      ready: false
+    })
+
     registry.isReady((err, ready) => {
 
       if (ready) {
@@ -148,8 +152,6 @@ class App extends React.Component {
           manager = result
           registry.claimer((err, result) => {
             claimer = result
-
-            console.log(manager, claimer)
 
             return fetch(window.location.origin + '/api/contract-abi?r=' + Math.random(), {
               method: 'POST',

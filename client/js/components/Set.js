@@ -51,12 +51,10 @@ class Set extends Basic {
             const lastUpdate = addressLastUpdate > uidLastUpdate ? addressLastUpdate : uidLastUpdate
             const now = Math.round(Date.now()/1000)
             const timeNeed = lastUpdate + minimumTimeBeforeUpdate - now
-            if (timeNeed > 10) {
-              this.setState({
+            this.setState({
+                timeNeed,
                 upgradabilityMessage: `you have set it recently and, for security reason, you have to wait ${timeNeed} seconds before updating it.`
               })
-            }
-
           })
         })
       })
@@ -76,7 +74,7 @@ class Set extends Basic {
   goToProfile() {
     this.db.set(this.shortWallet(), {})
     this.props.app.callMethod('getAccounts')
-    this.props.app.history.go(-5)
+    this.historyPush('welcome')
   }
 
   componentDidMount() {
@@ -285,7 +283,8 @@ class Set extends Basic {
       const gasLimit = 185e3
 
       const cost = this.formatFloat(gasPrice * gasLimit / 1e18, 4)
-      const cost$ = this.formatFloat(price * gasPrice * gasLimit / 1e18, 1)
+      const cost$ = this.formatFloat(price * gasPrice * gasLimit / 1e18, 2)
+      const safeLow = this.formatFloat(as.gasInfo.safeLow /10, 1)
 
       return (
         <Grid>
@@ -295,7 +294,7 @@ class Set extends Basic {
               <Panel>
                 <Panel.Body>
                   <p><strong>All is ready</strong></p>
-                  <p>In the next step you will send {cost} ether (${cost$}) to the Tweedentity Smart Contract to
+                  <p>In the next step, since the current gasSafeLow is {safeLow} GWei, you will send {cost} ether (${cost$}) to the Tweedentity Smart Contract to
                     cover the gas necessary to set your <em>tweedentity</em> in the Ethereum Blockchain. Be
                     adviced, after than you have created it, your Twitter user-id and your wallet will be publicly
                     associated.</p>
@@ -312,28 +311,28 @@ class Set extends Basic {
                       /></p>
                       : ''
                   }
-                  {this.state.upgradability === 0 ?
-                    <LoadingButton
+                  {this.state.upgradability === 0 || (typeof this.state.timeNeed !== 'undefined' && this.state.timeNeed > 10) ?
+                    <p><LoadingButton
                       text={as.err ? 'Try again' : 'Set it now!'}
                       loadingText="Starting transaction"
                       loading={as.loading}
                       cmd={() => {
                         this.startTransaction(as)
                       }}
-                    /> :
+                    /></p> :
 
                     this.state.upgradabilityMessage
-                    ? <BigAlert
+                    ? <p><BigAlert
                         bsStyle="warning"
                         message={`The tweedentity is not upgradable because ${this.state.upgradabilityMessage}`}
-                      />
-                    : <BigAlert
+                      /></p>
+                    : <p><BigAlert
                       bsStyle="warning"
                       title="Whoops"
                       message="The tweedentity looks not upgradable"
                       link={this.investigateNotUpgradability}
                       linkMessage="Find why"
-                    />}
+                    /></p>}
 
                 </Panel.Body>
               </Panel>
@@ -406,7 +405,11 @@ class Set extends Basic {
                     message={as.err}
                     link={() => {
                       this.setGlobalState({}, {err: null})
-                      this.props.app.callMethod('historyBack')
+                      this.setGlobalState({
+                        started: false,
+                        step: 0
+                      })
+                      this.historyPush('signed')
                     }}
                     linkMessage="Go back"
                   />

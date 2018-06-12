@@ -1,4 +1,5 @@
 import LoadingButton from './extras/LoadingButton'
+import BigAlert from './extras/BigAlert'
 import Basic from './Basic'
 
 const {Panel, Grid, Row, Col, FormGroup, Button, FormControl} = ReactBootstrap
@@ -14,6 +15,13 @@ class Signed extends Basic {
     ]) {
       this[m] = this[m].bind(this)
     }
+  }
+
+  componentDidMount() {
+    this.setGlobalState({
+      started: false,
+      step: 0
+    })
   }
 
   handleFocus(event) {
@@ -100,7 +108,8 @@ class Signed extends Basic {
                       title="Whoops"
                       message="The Twitter user has not been found. Very weird :-("
                       link={() => {
-                        this.setGlobalState({step: 1}, {err: null})
+                        this.setGlobalState({}, {err: null})
+                        this.historyPush('get-username')
                       }}
                       linkMessage="Input the username again"
                     />
@@ -109,16 +118,18 @@ class Signed extends Basic {
                       title="Whoops"
                       message="No tweet with a valid signature was found."
                       link={() => {
-                        this.setGlobalState({step: 1}, {err: null})
+                        this.setGlobalState({}, {err: null})
+                        this.historyPush('userid-found')
                       }}
-                      linkMessage="Input the username again"
+                      linkMessage="Go back and tweet the signature"
                     />
                     : as.err === 'Wrong signature'
                       ? <BigAlert
                         title="Whoops"
                         message="A tweet was found but with a wrong signature."
                         link={() => {
-                          this.setGlobalState({step: 1}, {err: null})
+                          this.setGlobalState({}, {err: null})
+                          this.historyPush('get-username')
                         }}
                         linkMessage="Input the username again"
                       />
@@ -127,7 +138,8 @@ class Signed extends Basic {
                           title="Whoops"
                           message="A tweet with the right signature was found, but it was posted by someone else."
                           link={() => {
-                            this.setGlobalState({step: 1}, {err: null})
+                            this.setGlobalState({}, {err: null})
+                            this.historyPush('get-username')
                           }}
                           linkMessage="Input the username again"
                         />

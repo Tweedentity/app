@@ -26,7 +26,7 @@ class NetworkStatus extends React.Component {
 
     return (
     <div className="overHeader">
-      {connectedTo}
+      THIS IS A BETA VERSION &nbsp; {connectedTo}
     </div>
     )
   }

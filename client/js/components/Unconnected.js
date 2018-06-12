@@ -20,9 +20,9 @@ class Unconnected extends Basic {
 
         welcomeMessage = <BigAlert
           title="Web3js not found"
-          message="You must either install Metamask or use a browser compatible with Ethereum like Mist, Parity or Brave."
+          message="You must either install MetaMask or use a browser compatible with Ethereum like Mist, Parity or Brave."
           link="https://metamask.io"
-          linkMessage="Get Metamask"
+          linkMessage="Get MetaMask"
         />
 
       } else if (netId === '0') {

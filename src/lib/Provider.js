@@ -141,10 +141,10 @@ class Provider {
     fs.writeFileSync(path.resolve(__dirname, '../../log/log' + Math.random() + ".html"), src)
   }
 
-  scanTweets(screenName, sig) {
+  scanTweets(username, sig) {
     let errorMessage
     return request
-      .get(`https://twitter.com/${screenName}`)
+      .get(`https://twitter.com/${username}`)
       .then(tweet => {
         if (tweet.text) {
 
@@ -155,7 +155,7 @@ class Provider {
 
           $('div.tweet').each((index, elem) => {
             if (!data && $(elem).attr('data-screen-name') &&
-              $(elem).attr('data-screen-name').toLowerCase() === screenName.toLowerCase()) {
+              $(elem).attr('data-screen-name').toLowerCase() === username.toLowerCase()) {
               let tweetSig = $('p.TweetTextSize', $(elem)).text()
               if (tweetSig === sig) {
                 data = $(elem)
@@ -222,10 +222,14 @@ class Provider {
     }
   }
 
-  getUserId(screenName) {
+  saveFile(fn, str) {
+    fs.writeFileSync(path.resolve(__dirname, '../../log', fn), str)
+  }
+
+  getUserId(username) {
     let errorMessage
     return request
-      .get(`https://twitter.com/${screenName}`)
+      .get(`https://twitter.com/${username}`)
       .then(tweet => {
         if (tweet.text) {
           const $ = cheerio.load(tweet.text)
@@ -258,7 +262,6 @@ class Provider {
         }
       })
       .catch((err) => {
-        console.log(err)
         return Promise.resolve({
           error: errorMessage || 'User not found'
         })

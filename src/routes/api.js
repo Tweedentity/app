@@ -65,7 +65,7 @@ router.post('/scan-tweets', jsonParser, function (req, res, next) {
 
   const provider = new Provider(req.body.network)
 
-  provider.scanTweets(req.body.screenName, req.body.sig)
+  provider.scanTweets(req.body.username, req.body.sig)
     .then(results => {
       if (results.error) {
         throw(new Error(results.error))
@@ -117,7 +117,7 @@ router.post('/twitter-user-id', jsonParser, function (req, res, next) {
 
   const provider = new Provider(req.body.network)
 
-  provider.getUserId(req.body.screenName)
+  provider.getUserId(req.body.username)
     .then(result => {
       res.status(200).json(result)
     })

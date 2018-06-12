@@ -124,6 +124,7 @@ div.account .settingsIcon {
     right: 27px;
     font-size: 18px;
     color: #17AFD0;
+    cursor: pointer;
 }
 
 p.user-data {

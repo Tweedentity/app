@@ -2,6 +2,7 @@ const sigUtil = require('eth-sig-util')
 
 import LoadingButton from './extras/LoadingButton'
 import Basic from './Basic'
+import BigAlert from './extras/BigAlert'
 
 const {Panel, Grid, Row, Col, Button} = ReactBootstrap
 
@@ -23,9 +24,9 @@ class UserIdFound extends Basic {
   }
 
   getValidationState() {
-    if (/^[a-zA-Z0-9_]{1,15}$/.test(this.getGlobalState('screenName'))) {
+    if (/^[a-zA-Z0-9_]{1,15}$/.test(this.getGlobalState('username'))) {
       return 'success'
-    } else if (this.getGlobalState('screenName').length > 0) {
+    } else if (this.getGlobalState('username').length > 0) {
       return 'error'
     }
     return null
@@ -90,9 +91,9 @@ class UserIdFound extends Basic {
     const as = this.appState()
     const wallet = as.wallet
 
-    const state = as.data[this.shortWallet()]
+    const twitter = as.data[this.shortWallet()]
 
-    const sigStr = `twitter/${state.userId}`
+    const sigStr = `twitter/${twitter.userId}`
 
     return (
       <Grid>
@@ -105,11 +106,11 @@ class UserIdFound extends Basic {
           <Col md={4}>
             <Panel>
               <Panel.Body>
-                <p><img style={{borderRadius: 50}} src={state.avatar} width="73" height="73"/></p>
-                <p><a href={'https://twitter.com/' + state.screenName}
-                      target="_blank">@{state.screenName}</a><br/>
-                  {state.name}</p>
-                <p>Twitter user-id:<br/><code>{state.userId}</code></p>
+                <p><img style={{borderRadius: 50}} src={twitter.avatar} width="73" height="73"/></p>
+                <p><a href={'https://twitter.com/' + twitter.username}
+                      target="_blank">@{twitter.username}</a><br/>
+                  {twitter.name}</p>
+                <p>Twitter user-id:<br/><code>{twitter.userId}</code></p>
               </Panel.Body>
             </Panel>
           </Col>

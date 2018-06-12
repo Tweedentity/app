@@ -38,7 +38,7 @@ class Account extends Basic {
                  target="_blank">{this.props.decoratedUsername}</a>
             </p>
             <p style={{paddingTop: 8}}>
-              ID: <code>{this.props.userId}</code>
+              <span className="code">ID: {this.props.userId}</span>
             </p>
           </span>
       } else {
@@ -65,13 +65,9 @@ class Account extends Basic {
         <Panel.Body>
           <div className="account">
             <i className={`fa fa-${this.props.icon} appIcon`}></i>
-            { this.props.active && this.props.userId
-              ? <i className="fa fa-cog settingsIcon" onClick={()=>{
-                this.setGlobalState({}, {
-                  show: true,
-                  modalTitle: 'Whoops',
-                  modalBody: 'This command will be activated soon.'
-                })
+            { this.props.active && this.props.userId && !this.props.noSettings
+              ? <i className="fa fa-cog settingsIcon" onClick={() => {
+                this.historyPush('manage-account')
               }}></i>
             : null}
             {content}

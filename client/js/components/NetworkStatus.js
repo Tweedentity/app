@@ -13,20 +13,20 @@ class NetworkStatus extends React.Component {
 
     } else if (netId == '0') {
 
-      connectedTo = <span>You are connected to an unsupported Ethereum network</span>
+      connectedTo = <span><i className="fa fa-plug" style={{color: '#f66'}}></i> You are connected to an unsupported Ethereum network</span>
 
     } else if (netId == '1') {
 
-      connectedTo = <span>You are connected to the main Ethereum network</span>
+      connectedTo = <span><i className="fa fa-plug" style={{color: '#f66'}}></i> You are connected to the main Ethereum network</span>
 
     } else {
 
-      connectedTo = <span>You are connected to the {netId === 1 ? 'main Ethereum' : 'Ropsten test'} network</span>
+      connectedTo = <span><i className="fa fa-plug" style={{color: '#8f6'}}></i> You are connected to the {netId === 1 ? 'main Ethereum' : 'Ropsten test'} network</span>
     }
 
     return (
     <div className="overHeader">
-      <i className="fa fa-cogs"></i> &nbsp; {connectedTo}
+      {connectedTo}
     </div>
     )
   }

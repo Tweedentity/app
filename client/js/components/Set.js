@@ -7,7 +7,7 @@ import BigAlert from './extras/BigAlert'
 const {Panel, Grid, Row, Col, Button} = ReactBootstrap
 
 
-class Create extends Basic {
+class Set extends Basic {
   constructor(props) {
     super(props)
 
@@ -51,9 +51,11 @@ class Create extends Basic {
             const lastUpdate = addressLastUpdate > uidLastUpdate ? addressLastUpdate : uidLastUpdate
             const now = Math.round(Date.now()/1000)
             const timeNeed = lastUpdate + minimumTimeBeforeUpdate - now
-            this.setState({
-              upgradabilityMessage: `you have set it recently and, for security reason, you have to wait ${timeNeed} seconds before updating it.`
-            })
+            if (timeNeed > 10) {
+              this.setState({
+                upgradabilityMessage: `you have set it recently and, for security reason, you have to wait ${timeNeed} seconds before updating it.`
+              })
+            }
 
           })
         })
@@ -82,7 +84,7 @@ class Create extends Basic {
       this.watcher = new EventWatcher(this.web3js)
       const checkState = () => {
         if (this.appState().wallet) {
-          if (this.appState().hash === 'create') {
+          if (this.appState().hash === 'set') {
             this.historyPush('signed')
           }
         } else {
@@ -226,6 +228,7 @@ class Create extends Basic {
             if (err) {
               this.setGlobalState({}, {
                 err: 'The transaction has been denied',
+                errMessage: 'If you like to set your tweedentity, click the button above to start the transaction.',
                 loading: false
               })
             }
@@ -246,7 +249,8 @@ class Create extends Basic {
                 null,
                 () => {
                   this.setGlobalState({}, {
-                    err: 'The transaction has been reverted'
+                    err: 'The transaction has been reverted',
+                    errMessage: 'If you like to set your tweedentity, click the button above to try again.',
                   })
                 }
               )
@@ -274,13 +278,6 @@ class Create extends Basic {
 
     const state = as.data[this.shortWallet()]
 
-    const price = parseFloat(as.price, 10)
-    const gasPrice = as.gasInfo.safeLow * 1e8
-    const gasLimit = 185e3
-
-    const cost = this.formatFloat(gasPrice * gasLimit / 1e18, 4)
-    const cost$ = this.formatFloat(price * gasPrice * gasLimit / 1e18, 1)
-
     if (!state.started) {
 
       const price = parseFloat(as.price, 10)
@@ -290,21 +287,16 @@ class Create extends Basic {
       const cost = this.formatFloat(gasPrice * gasLimit / 1e18, 4)
       const cost$ = this.formatFloat(price * gasPrice * gasLimit / 1e18, 1)
 
-      const params = {
-        value: gasPrice * gasLimit,
-        gas: 255e3,
-      }
-
       return (
         <Grid>
           <Row>
             <Col md={12}>
-              <h4 style={{paddingLeft: 15}}>Create your <em>tweedentity</em></h4>
+              <h4 style={{paddingLeft: 15}}>Set your <em>tweedentity</em></h4>
               <Panel>
                 <Panel.Body>
                   <p><strong>All is ready</strong></p>
                   <p>In the next step you will send {cost} ether (${cost$}) to the Tweedentity Smart Contract to
-                    cover the gas necessary to create your <em>tweedentity</em> in the Ethereum Blockchain. Be
+                    cover the gas necessary to set your <em>tweedentity</em> in the Ethereum Blockchain. Be
                     adviced, after than you have created it, your Twitter user-id and your wallet will be publicly
                     associated.</p>
                   <p><span className="code">TwitterUserId:</span> <span
@@ -314,15 +306,15 @@ class Create extends Basic {
                   </p>
                   {
                     as.err
-                      ? <BigAlert
+                      ? <p><BigAlert
                         title={as.err}
                         message={as.errMessage}
-                      />
+                      /></p>
                       : ''
                   }
                   {this.state.upgradability === 0 ?
                     <LoadingButton
-                      text={as.err ? 'Try again' : 'Create it now!'}
+                      text={as.err ? 'Try again' : 'Set it now!'}
                       loadingText="Starting transaction"
                       loading={as.loading}
                       cmd={() => {
@@ -431,4 +423,4 @@ class Create extends Basic {
   }
 }
 
-export default Create
+export default Set

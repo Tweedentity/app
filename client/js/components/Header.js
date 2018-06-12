@@ -4,6 +4,20 @@ import Basic from './Basic'
 
 class Header extends Basic {
 
+
+  constructor(props) {
+    super(props)
+
+    this.execCommand = this.execCommand.bind(this)
+  }
+
+
+  execCommand(key) {
+    if (key === 2) {
+      this.historyPush('profile')
+    }
+  }
+
   render() {
 
     let dropDown
@@ -20,13 +34,13 @@ class Header extends Basic {
 
       if (twitter && twitter.name) {
         dropDown = <NavDropdown eventKey={3} title={<img src={twitter.avatar} className="tavatar circled"/>}
-                                id="basic-nav-dropdown">
+                                id="basic-nav-dropdown" onSelect={this.execCommand}>
           <li role="presentation">
             <span><b className="tname">{twitter.name}</b><br/>
               @{twitter.username}</span>
           </li>
-          <MenuItem divider/>
-          <MenuItem eventKey={3.1}>Settings</MenuItem>
+          {/*<MenuItem divider/>*/}
+          {/*<MenuItem eventKey={2}>Profile</MenuItem>*/}
         </NavDropdown>
       } else {
         dropDown = <Nav>

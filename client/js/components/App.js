@@ -6,6 +6,7 @@ const config = require('../config')
 const Db = require('../utils/Db')
 
 import Header from './Header'
+import Footer from './Footer'
 import Unconnected from "./Unconnected"
 import Welcome from "./Welcome"
 import WalletStats from "./WalletStats"
@@ -156,7 +157,7 @@ class App extends React.Component {
                   manager,
                   claimer
                 ]
-              }),
+              })
             })
               .then((response) => response.json())
               .then((responseJson) => {
@@ -188,11 +189,14 @@ class App extends React.Component {
 
   getEthInfo() {
     return fetch(window.location.origin + '/api/eth-info?r=' + Math.random(), {
-      method: 'GET',
+      method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
-      }
+      },
+      body: JSON.stringify({
+        network: this.state.netId
+      })
     })
       .then((response) => response.json())
       .then((responseJson) => {
@@ -245,6 +249,7 @@ class App extends React.Component {
                 'Content-Type': 'application/json',
               },
               body: JSON.stringify({
+                network: this.state.netId,
                 userId
               })
             }).then(response => {
@@ -324,7 +329,7 @@ class App extends React.Component {
       component = <Unconnected app={app}/>
     } else if (this.state.wallet) {
       const sections = this.state.sections[this.state.wallet.substring(0, 6)] || {}
-      if (sections[hash.substring(2)]) {
+      if (hash === '#/welcome' || sections[hash.substring(2)]) {
         if (hash === '#/welcome') {
           component = <Welcome app={app}/>
         } else if (hash === '#/wallet-stats') {
@@ -345,6 +350,7 @@ class App extends React.Component {
       <div>
         <Header app={app}/>
         {component}
+        <Footer app={app} />
       </div>
     )
   }

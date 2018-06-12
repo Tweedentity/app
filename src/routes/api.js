@@ -1,10 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const jsonParser = require('body-parser').json()
-const provider = require('../lib/Provider')
+const Provider = require('../lib/Provider')
 
 
-router.get('/eth-info', function (req, res, next) {
+router.post('/eth-info', jsonParser, function (req, res, next) {
+
+  const provider = new Provider(req.body.network)
 
   Promise.all([
     provider.gethEtherPrice(),
@@ -24,6 +26,7 @@ router.get('/eth-info', function (req, res, next) {
 
 router.post('/wallet-stats', jsonParser, function (req, res, next) {
 
+  const provider = new Provider(req.body.network)
   const address = req.body.address
 
   Promise.all([
@@ -42,6 +45,8 @@ router.post('/wallet-stats', jsonParser, function (req, res, next) {
 })
 
 router.post('/get-txs', jsonParser, function (req, res, next) {
+
+  const provider = new Provider(req.body.network)
   provider.getTxs(req.body)
     .then(results => {
       if (results.error) {
@@ -57,6 +62,8 @@ router.post('/get-txs', jsonParser, function (req, res, next) {
 
 
 router.post('/scan-tweets', jsonParser, function (req, res, next) {
+
+  const provider = new Provider(req.body.network)
 
   provider.scanTweets(req.body.screenName, req.body.sig)
     .then(results => {
@@ -75,6 +82,8 @@ router.post('/scan-tweets', jsonParser, function (req, res, next) {
 
 router.get('/gas-info', function (req, res, next) {
 
+  const provider = new Provider(req.body.network)
+
   provider.getGasInfo()
     .then(results => {
       res.status(200).json(results)
@@ -86,6 +95,8 @@ router.get('/gas-info', function (req, res, next) {
 })
 
 router.post('/contract-abi', jsonParser, function (req, res, next) {
+
+  const provider = new Provider(req.body.network)
 
   let promises = []
   for (let a of req.body.addresses) {
@@ -104,6 +115,8 @@ router.post('/contract-abi', jsonParser, function (req, res, next) {
 
 router.post('/twitter-user-id', jsonParser, function (req, res, next) {
 
+  const provider = new Provider(req.body.network)
+
   provider.getUserId(req.body.screenName)
     .then(result => {
       res.status(200).json(result)
@@ -116,6 +129,8 @@ router.post('/twitter-user-id', jsonParser, function (req, res, next) {
 
 router.post('/twitter-data', jsonParser, function (req, res, next) {
 
+  const provider = new Provider(req.body.network)
+
   provider.getDataFromUserId(req.body.userId)
     .then(result => {
       res.status(200).json(result)
@@ -126,13 +141,5 @@ router.post('/twitter-data', jsonParser, function (req, res, next) {
 
 })
 
-
-router.get('/', function (req, res, next) {
-
-  res.json({
-    success: true,
-    message: 'Welcome!'
-  })
-})
 
 module.exports = router

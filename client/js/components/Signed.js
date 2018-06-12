@@ -32,6 +32,7 @@ class Signed extends Basic {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        network: this.appState().netId,
         screenName: this.getGlobalState('screenName'),
         sig: this.getGlobalState('tweet')
       }),

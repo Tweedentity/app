@@ -1,0 +1,72 @@
+const {Grid, Row, Col} = ReactBootstrap
+import Basic from './Basic'
+
+class Footer extends Basic {
+
+
+  constructor(props) {
+    super(props)
+
+    this.execCommand = this.execCommand.bind(this)
+  }
+
+
+  execCommand(key) {
+    if (key === 2) {
+      this.historyPush('profile')
+    }
+  }
+
+  render() {
+
+
+    return (
+      <div className="footer">
+        <Grid>
+          <Row>
+            <Col md={12}>
+              <div className="centered level0">
+                Tweedentity is part of the <a href="https://0xnil.com" target="_blank">0xNIL</a> project.
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              <div className="centered level1">
+                <span className="item" target="_blank" href="#">
+                  <i className="fa fa-dot-circle-o"></i> Terms and Conditions
+                </span>
+                <span className="item" target="_blank" href="#">
+                  <i className="fa fa-user-secret"></i> Privacy
+                </span>
+                <a className="item">|</a>
+                <a className="item" target="_blank" href="https://medium.com/0xnil/search?q=tweedentity">
+                  <i className="fa fa-medium"></i> Blog
+                </a>
+                <a className="item" target="_blank" href="https://twitter.com/tweedentity">
+                  <i className="fa fa-twitter"></i> Twitter
+                </a>
+                <a className="item" target="_blank" href="https://github.com/tweedentity">
+                  <i className="fa fa-github"></i> Github
+                </a>
+                <a className="item" href="mailto:info@tweedentity.com">
+                  <i className="fa fa-envelope"></i> Email
+                </a>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={12}>
+              <div className="centered level2">
+                (c) 2018, Tweedentity
+              </div>
+            </Col>
+          </Row>
+        </Grid>
+      </div>
+    )
+
+  }
+}
+
+export default Footer

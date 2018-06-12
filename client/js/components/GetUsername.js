@@ -41,6 +41,7 @@ class GetUsername extends Basic {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        network: this.appState().netId,
         screenName: this.getGlobalState('screenName')
       }),
     })

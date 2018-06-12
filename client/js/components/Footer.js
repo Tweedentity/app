@@ -3,13 +3,11 @@ import Basic from './Basic'
 
 class Footer extends Basic {
 
-
   constructor(props) {
     super(props)
 
     this.execCommand = this.execCommand.bind(this)
   }
-
 
   execCommand(key) {
     if (key === 2) {
@@ -18,7 +16,6 @@ class Footer extends Basic {
   }
 
   render() {
-
 
     return (
       <div className="footer">
@@ -77,7 +74,6 @@ class Footer extends Basic {
         </Grid>
       </div>
     )
-
   }
 }
 

@@ -67,7 +67,13 @@ class Welcome extends Basic {
         <Grid>
           <Row>
             <Col md={12}>
-              <h4 style={{textAlign: 'center', marginBottom: 48}}>
+              <h4 style={{
+                textAlign: 'center',
+                marginBottom: 48,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>
                 {
                   userId
                   ? 'Welcome back ' : 'Welcome '

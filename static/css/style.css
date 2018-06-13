@@ -85,7 +85,7 @@ span.danger {
 
 
 .footer {
-    margin-top: 100px;
+    margin-top: 40px;
     border-top: 1px solid #edfafc;
 }
 
@@ -173,4 +173,15 @@ div.thinline > div {
 
 .trynow {
     padding-top: 42px;
+}
+
+.semicentered {
+    text-align: center;
+    padding: 24px;
+    margin-left: -18px;
+}
+
+.semicentered span.badge {
+    font-size: 200%;
+    background-color: #bbb;
 }

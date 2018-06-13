@@ -8,7 +8,8 @@
     "posttest": "istanbul check-coverage --statements 85 --branches 85 --functions 85 --lines 85",
     "build": "webpack && bin/post-build.sh",
     "dev": "npm run build && export NODE_ENV=development && source ../.default.env && node . --redis-local",
-    "local": "npm run build && docker/dev.sh"
+    "local": "npm run build && docker/dev.sh",
+    "go": "git pull && npm run build && docker/node.sh"
   },
   "dependencies": {
     "append-stream": "^1.2.2",

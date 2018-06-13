@@ -1,6 +1,6 @@
 import Basic from './Basic'
 
-const {Grid, Row, Col, Button} = ReactBootstrap
+const {Grid, Row, Col, Button, Badge} = ReactBootstrap
 
 
 class LandingPage extends Basic {
@@ -10,7 +10,7 @@ class LandingPage extends Basic {
   }
 
   goToApp() {
-    window.location = `${location.protocol}//dapp.${location.host}`
+    window.location = `${location.protocol}//app.${location.host}`
   }
 
   render() {
@@ -42,19 +42,19 @@ class LandingPage extends Basic {
         <Grid>
         <Row>
           <Col md={3}>
-            <h4>What it is</h4>
+            <h3>What it is</h3>
             <p>Tweedentity is a secure identity solution that connects the centralized and
               the decentralized world, associating univocally a Twitter user-id to an Ethereum address.
             </p>
           </Col>
           <Col md={3}>
-            <h4>What it allows</h4>
+            <h3>What it allows</h3>
             <p>After setting up your <i>tweedentity</i>, anytime that you open a ÐApp, it will recognizes
               your Twitter user-id and authenticate yourself. Automatically.
             </p>
           </Col>
           <Col md={3}>
-            <h4>Why is great</h4>
+            <h3>Why it's great</h3>
             <p>No more username, email, and passwords. Who you are is incised in the blockchain.
             </p>
             <p className="smaller">You may just need
@@ -78,14 +78,13 @@ class LandingPage extends Basic {
           <Col md={12}>
             <div className="centered">
             <h1>How it works</h1>
-            <p>Skip it if you don't like technicalities :-)</p>
             </div>
           </Col>
         </Row>
 
         <Row>
           <Col md={3}>
-            <h2>1</h2>
+            <div className="semicentered"><Badge>1</Badge></div>
             <p>The Tweedentity ÐApp asks your Twitter screen name, retrieves from
               Twitter your user-id (for example '12345') and starts Metamask to sign a string like
               'twitter/12345' with your wallet.
@@ -93,20 +92,20 @@ class LandingPage extends Basic {
 
           </Col>
           <Col md={3}>
-            <h2>2</h2>
+            <div className="semicentered"><Badge>2</Badge></div>
             <p>After receiving the signature from Metamask, and verifying that it is correct (to avoid
               spending gas for nothing), the ÐApp will ask you to publish it on your Twitter feed.
             </p>
           </Col>
           <Col md={3}>
-            <h2>3</h2>
+            <div className="semicentered"><Badge>3</Badge></div>
             <p>When you have done, the ÐApp reads your Twitter feed, detects the tweet containing the
               signature, and asks you to send a fraction of a dollar to the Tweedentity smart contract,
               passing the id of the tweet as data.
             </p>
           </Col>
           <Col md={3}>
-            <h2>4</h2>
+            <div className="semicentered"><Badge>4</Badge></div>
             <p>The smart contract uses the fraction of a dollar to pay a third party call to an API which
               retrieves the tweet and verifies that the signature is correct. If so, the smart contract
               saves the new <i>tweedentity</i> in the blockchain. </p>

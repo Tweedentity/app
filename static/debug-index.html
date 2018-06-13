@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><title>Tweedentity ÐApp</title>
-
+<head><title>Tweedentity</title>
+  <script>
+    if (/^www\./.test(location.host)) {
+      location.replace(`${location.protocol}//${location.host.replace(/$www\./,'')}/${location.pathname}`)
+    }
+    // else if (/^app\./.test(location.host)) {
+    //   location.replace(`${location.protocol}//d${location.host}/${location.pathname}`)
+    // }
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato"/>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
         crossorigin="anonymous">
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
   <link rel="stylesheet" href="/css/style.css"/>
   <link rel="icon" href="favicon.ico?v=2"/>

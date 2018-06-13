@@ -11,6 +11,10 @@ class Header extends Basic {
     this.execCommand = this.execCommand.bind(this)
   }
 
+  goHome() {
+    window.location = `${location.protocol}//${location.host.replace(/(d|)app\./,'')}`
+  }
+
 
   execCommand(key) {
     if (key === 2) {
@@ -62,9 +66,8 @@ class Header extends Basic {
         >
           <Navbar.Header>
             <Navbar.Brand>
-              <img src="img/tweedentity-full-logo-w-ico.png" style={{
-                marginTop: -1,
-              cursor: 'pointer'}}
+              <img src="img/tweedentity-full-logo-w-ico.png" className="logo-header"
+                   onClick={this.goHome}
               />
             </Navbar.Brand>
             <Navbar.Toggle/>

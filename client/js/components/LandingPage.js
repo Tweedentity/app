@@ -1,0 +1,176 @@
+import Basic from './Basic'
+
+const {Grid, Row, Col, Button} = ReactBootstrap
+
+
+class LandingPage extends Basic {
+
+  componentDidMount () {
+    document.title = "Tweedentity - A self-claimed identity system"
+  }
+
+  goToApp() {
+    window.location = `${location.protocol}//app.${location.host}`
+  }
+
+  render() {
+
+    const as = this.appState()
+
+
+    return (
+      <div>
+      <Grid>
+
+        <Row>
+          <Col md={12}>
+            <p className="centered logo"><img src="/img/tweedentity-complete-logo.png" className="fulllogo" /></p>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={12}>
+            <blockquote>In the era of decentralized apps (ÐApps), people deserve a simpler way to identify
+              themselves and log in.
+            </blockquote>
+          </Col>
+        </Row>
+      </Grid>
+
+        <div className="thinline"><div></div></div>
+
+        <Grid>
+        <Row>
+          <Col md={3}>
+            <h4>What it is</h4>
+            <p>Tweedentity is a secure identity solution that connects the centralized and
+              the decentralized world, associating univocally a Twitter user-id to an Ethereum address.
+            </p>
+          </Col>
+          <Col md={3}>
+            <h4>What it allows</h4>
+            <p>After setting up your <i>tweedentity</i>, anytime that you open a ÐApp, it will recognizes
+              your Twitter user-id and authenticate yourself. Automatically.
+            </p>
+          </Col>
+          <Col md={3}>
+            <h4>Why is great</h4>
+            <p>No more username, email, and passwords. Who you are is incised in the blockchain.
+            </p>
+            <p className="smaller">You may just need
+              to confirm your <i>tweedentity</i> signing a verification code with your wallet.</p>
+          </Col>
+          <Col md={3}>
+            <p className="centered trynow">
+              <Button bsStyle="info" bsSize="large"
+            onClick={ this.goToApp}
+            >Try the beta!</Button>
+            </p>
+          </Col>
+        </Row>
+        </Grid>
+
+        <div className="thinline"><div></div></div>
+
+        <Grid>
+
+        <Row>
+          <Col md={12}>
+            <div className="centered">
+            <h1>How it works</h1>
+            <p>Skip it if you don't like technicalities :-)</p>
+            </div>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={3}>
+            <h2>1</h2>
+            <p>The Tweedentity ÐApp asks your Twitter screen name, retrieves from
+              Twitter your user-id (for example '12345') and starts Metamask to sign a string like
+              'twitter/12345' with your wallet.
+            </p>
+
+          </Col>
+          <Col md={3}>
+            <h2>2</h2>
+            <p>After receiving the signature from Metamask, and verifying that it is correct (to avoid
+              spending gas for nothing), the ÐApp will ask you to publish it on your Twitter feed.
+            </p>
+          </Col>
+          <Col md={3}>
+            <h2>3</h2>
+            <p>When you have done, the ÐApp reads your Twitter feed, detects the tweet containing the
+              signature, and asks you to send a fraction of a dollar to the Tweedentity smart contract,
+              passing the id of the tweet as data.
+            </p>
+          </Col>
+          <Col md={3}>
+            <h2>4</h2>
+            <p>The smart contract uses the fraction of a dollar to pay a third party call to an API which
+              retrieves the tweet and verifies that the signature is correct. If so, the smart contract
+              saves the new <i>tweedentity</i> in the blockchain. </p>
+          </Col>
+        </Row>
+        </Grid>
+
+        <div className="thinline"><div></div></div>
+
+        <Grid>
+        <Row>
+          <Col md={6}>
+            <h3>Privacy</h3>
+            <p>
+              The blockchain is public. If you set
+              your <i>tweedentity</i>
+              using a wallet which you usually use to send and receive coins, everyone will know all of your
+              business.
+            </p>
+            <p>The best practice is to use a brand new wallet which has no connections with any of your
+              other wallets. Though, you need a bit of ether to activate your <i>tweedentity</i>. The best
+              way to transfer ether to your brand new identity wallet is to use an exchange like
+              <a
+                href="https://https://shapeshift.io/" target="_blank">ShapeShift</a> or a mixer like <a
+                href="https://www.eth-mixer.com/" target="_blank">ETH-Mixer</a>.
+            </p>
+          </Col>
+          <Col md={6}>
+            <h3>Security</h3>
+            <p>
+              The blockchain is a very secure technology that nobody
+              has
+              been able to break in more than ten years from the appearance of Bitcoin. </p>
+            <p className="mb9">Tweedentity uses a set of smart contracts in the Ethereum VM, paired with a
+              minimal server API, to verify and save your identity. No one but you can set
+              your <i>tweedentity</i>
+              up. No one but you can remove it from the blockchain. </p>
+
+            <p><a href="https://medium.com/0xnil/introducing-tweedentity-7b6a355c83fb" target="_blank">Read
+              more about privacy and security in this intro post</a>
+            </p>
+          </Col>
+        </Row>
+
+        <Row>
+          <Col md={6}>
+            <h3>Development</h3>
+            <p><b><a target="_blank" href="https://github.com/tweedentity/api">Tweedentity API</a></b><br/>A
+              simple API to retrieve the tweet and verify the signature.<br/><em>Done.</em></p>
+            <p><b><a target="_blank" href="https://github.com/tweedentity/store">Tweedentity
+              Store</a></b><br/>A set of smart contract to verify and save the <i>tweedentity</i>.<br/>
+              <em>Done.</em></p>
+            <p><b><a target="_blank" href="https://app.tweedentity.com">Tweedentity ÐApp</a></b><br/>A
+              decentralized app to set a tweedentity and remove an existent
+              one. <br/><em>Beta version. Git it a try on Ropsten.</em></p>
+            <p><b>Tweedentity.js</b><br/>A Javascript library for ÐApp developers. <br/><em>Coming
+              soon.</em></p>
+          </Col>
+        </Row>
+
+      </Grid>
+      </div>
+    )
+  }
+}
+
+export default LandingPage

@@ -67,7 +67,7 @@ class Footer extends Basic {
           <Row>
             <Col md={12}>
               <div className="centered level2">
-                (c) 2018, <a href="https://tweedentity.com">Tweedentity</a>
+                (c) 2018, Tweedentity
               </div>
             </Col>
           </Row>

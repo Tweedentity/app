@@ -19,11 +19,14 @@ import Set from './Set'
 import SectionNotFound from './SectionNotFound'
 import ManageAccount from './ManageAccount'
 import Unset from './Unset'
+import LandingPage from './LandingPage'
 
 class App extends React.Component {
 
   constructor(props) {
     super(props)
+
+    const www = /^(www\.|)tweedentity\.com(\.localhost|)$/.test(location.host)
 
     this.db = new Db(data => {
       this.setState({
@@ -39,7 +42,8 @@ class App extends React.Component {
       err: null,
       loading: false,
       data: this.db.data,
-      sections: {}
+      sections: {},
+      www
     }
 
     for (let m of [
@@ -56,7 +60,9 @@ class App extends React.Component {
       this[m] = this[m].bind(this)
     }
 
-    this.getNetwork()
+    if (!www) {
+      this.getNetwork()
+    }
 
   }
 
@@ -66,8 +72,11 @@ class App extends React.Component {
         hash: location.hash
       })
     })
+    if (!this.state.www) {
+      document.title = 'Tweedentity ÐApp (BETA)'
+    }
     this.historyPush({
-      section: 'connecting'
+      section: this.state.www ? 'home' : 'connecting'
     })
   }
 
@@ -339,37 +348,53 @@ class App extends React.Component {
       contracts: this.contracts,
       history
     }
-    let hash = this.state.hash
-    let component = <SectionNotFound app={app}/>
 
-    if (!hash || hash === '#/connecting') {
-      component = <Unconnected app={app}/>
-    } else if (this.state.wallet) {
-      const sections = this.state.sections[this.state.wallet.substring(0, 6)] || {}
-      if (hash === '#/welcome' || sections[hash.substring(2)]) {
-        if (hash === '#/welcome') {
-          component = <Welcome app={app}/>
-        } else if (hash === '#/wallet-stats') {
-          component = <WalletStats app={app}/>
-        } else if (hash === '#/get-username') {
-          component = <GetUsername app={app}/>
-        } else if (hash === '#/userid-found') {
-          component = <UserIdFound app={app}/>
-        } else if (hash === '#/signed') {
-          component = <Signed app={app}/>
-        } else if (hash === '#/set') {
-          component = <Set app={app}/>
-        } else if (hash === '#/manage-account') {
-          component = <ManageAccount app={app}/>
-        } else if (hash === '#/unset') {
-          component = <Unset app={app}/>
+    let hash = this.state.hash
+    let header
+    let component
+
+    if (this.state.www) {
+
+      component = <LandingPage app={app}/>
+
+      if (hash === '#/home') {
+
+      }
+
+    } else {
+
+      header = <Header app={app}/>
+      component = <SectionNotFound app={app}/>
+
+      if (!hash || hash === '#/connecting') {
+        component = <Unconnected app={app}/>
+      } else if (this.state.wallet) {
+        const sections = this.state.sections[this.state.wallet.substring(0, 6)] || {}
+        if (hash === '#/welcome' || sections[hash.substring(2)]) {
+          if (hash === '#/welcome') {
+            component = <Welcome app={app}/>
+          } else if (hash === '#/wallet-stats') {
+            component = <WalletStats app={app}/>
+          } else if (hash === '#/get-username') {
+            component = <GetUsername app={app}/>
+          } else if (hash === '#/userid-found') {
+            component = <UserIdFound app={app}/>
+          } else if (hash === '#/signed') {
+            component = <Signed app={app}/>
+          } else if (hash === '#/set') {
+            component = <Set app={app}/>
+          } else if (hash === '#/manage-account') {
+            component = <ManageAccount app={app}/>
+          } else if (hash === '#/unset') {
+            component = <Unset app={app}/>
+          }
         }
       }
     }
 
     return (
       <div>
-        <Header app={app}/>
+        {header}
         {component}
         <Footer app={app} />
         { this.state.show

@@ -1,4 +1,4 @@
 
-if (/(www\.|)tweedentity\.com$/.test(location.host) &&  location.protocol === 'http:') {
-    location = 'https://tweedentity.com'
+if (/^www\./.test(location.host)) {
+  location.replace(`${location.protocol}//${location.host.replace(/$www\./,'')}/${location.pathname}`)
 }

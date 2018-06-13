@@ -3,7 +3,7 @@
 <head><title>Tweedentity</title>
   <script>
     if (/^www\./.test(location.host)) {
-      location.replace(`${location.protocol}//${location.host.replace(/$www\./,'')}/${location.pathname}`)
+      location.href = location.href.replace(/www\./, '')
     }
     // else if (/^app\./.test(location.host)) {
     //   location.replace(`${location.protocol}//d${location.host}/${location.pathname}`)

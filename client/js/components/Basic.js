@@ -32,8 +32,8 @@ class Basic extends React.Component {
   setGlobalState(pars, states = {}) {
     if (this.appState().wallet) {
       this.db.put(this.shortWallet(), pars)
-      this.props.app.callMethod('setAppState', states)
     }
+    this.props.app.callMethod('setAppState', states)
   }
 
   shortWallet() {

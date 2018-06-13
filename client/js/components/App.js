@@ -392,6 +392,8 @@ class App extends React.Component {
       }
     }
 
+    console.log('this.state.show', this.state.show)
+
     return (
       <div>
         {header}

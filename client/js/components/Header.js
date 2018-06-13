@@ -12,7 +12,7 @@ class Header extends Basic {
   }
 
   goHome() {
-    window.location = `${location.protocol}//${location.host.replace(/(d|)app\./,'')}`
+    location.href = `${location.protocol}//${location.host.replace(/(d|)app\./,'')}/#/home`
   }
 
 

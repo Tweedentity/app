@@ -96,6 +96,7 @@ span.danger {
 .footer span.item {
     padding: 0 12px;
     color: #17AFD0;
+    cursor: pointer;
 }
 
 .centered {

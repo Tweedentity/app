@@ -5,18 +5,17 @@ const {Grid, Row, Col, Button, Badge} = ReactBootstrap
 
 class LandingPage extends Basic {
 
-  componentDidMount () {
-    document.title = "Tweedentity - A self-claimed identity system"
-  }
+  // componentDidMount () {
+  //   document.title = "Tweedentity - A self-claimed identity system"
+  // }
 
   goToApp() {
-    window.location = `${location.protocol}//app.${location.host}`
+    location.href = `${location.protocol}//app.${location.host}/#/connecting`
   }
 
   render() {
 
     const as = this.appState()
-
 
     return (
       <div>

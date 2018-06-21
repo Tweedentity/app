@@ -82,7 +82,7 @@ class Signed extends Basic {
       <Grid>
         <Row>
           <Col md={12}>
-            <h4 style={{paddingLeft: 15}}>Tweet and verify</h4>
+            <h4 style={{padding: '0 15px 8px'}}>Tweet and verify</h4>
             <Panel>
               <Panel.Body>
                 <p><strong>Signature ready</strong></p>

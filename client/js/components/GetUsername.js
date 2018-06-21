@@ -82,7 +82,7 @@ class GetUsername extends Basic {
       <Grid>
         <Row>
           <Col md={12}>
-            <h4 style={{paddingLeft: 15}}>Twitter Username</h4>
+            <h4 style={{padding: '0 15px 8px'}}>Twitter Username</h4>
             <Panel>
               <Panel.Body>
 

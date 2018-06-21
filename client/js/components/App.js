@@ -117,21 +117,18 @@ class App extends React.Component {
             env
           })
 
-          if (env === 'ropsten') {
 
-            const registry = this.web3js.eth.contract(config.registry.abi).at(config.registry.address[env])
-            const twitterStore = this.web3js.eth.contract(config.twitterStore.abi).at(config.twitterStore.address[env])
+          const registry = this.web3js.eth.contract(config.registry.abi).at(config.registry.address[env])
+          const twitterStore = this.web3js.eth.contract(config.twitterStore.abi).at(config.twitterStore.address[env])
 
-            this.contracts = {
-              registry,
-              twitterStore
-            }
-            this.watchAccounts0()
-            setInterval(this.watchAccounts0, 1000)
-            this.getEthInfo()
-            this.getContracts()
-
+          this.contracts = {
+            registry,
+            twitterStore
           }
+          this.watchAccounts0()
+          setInterval(this.watchAccounts0, 1000)
+          this.getEthInfo()
+          this.getContracts()
 
         }
 
@@ -331,11 +328,11 @@ class App extends React.Component {
   }
 
   handleClose() {
-    this.setState({ show: false });
+    this.setState({show: false});
   }
 
   handleShow() {
-    this.setState({ show: true });
+    this.setState({show: true});
   }
 
   render() {
@@ -392,27 +389,25 @@ class App extends React.Component {
       }
     }
 
-    console.log('this.state.show', this.state.show)
-
     return (
       <div>
         {header}
         {component}
-        <Footer app={app} />
-        { this.state.show
-        ? <Modal.Dialog>
-          <Modal.Header>
-            <Modal.Title>{this.state.modalTitle}</Modal.Title>
-          </Modal.Header>
+        <Footer app={app}/>
+        {this.state.show
+          ? <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Title>{this.state.modalTitle}</Modal.Title>
+            </Modal.Header>
 
-          <Modal.Body>{this.state.modalBody}</Modal.Body>
+            <Modal.Body>{this.state.modalBody}</Modal.Body>
 
-          <Modal.Footer>
-            <Button onClick={()=> {
-            this.setState({show: false})
-            }}>{this.state.modalClose || 'Close'}</Button>
-          </Modal.Footer>
-        </Modal.Dialog>
+            <Modal.Footer>
+              <Button onClick={() => {
+                this.setState({show: false})
+              }}>{this.state.modalClose || 'Close'}</Button>
+            </Modal.Footer>
+          </Modal.Dialog>
           : null}
       </div>
     )

@@ -5,6 +5,7 @@ const {Panel, Alert, Grid, Row, Col} = ReactBootstrap
 import Basic from './Basic'
 
 
+
 class Welcome extends Basic {
   constructor(props) {
     super(props)

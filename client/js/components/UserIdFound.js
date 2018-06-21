@@ -99,7 +99,7 @@ class UserIdFound extends Basic {
       <Grid>
         <Row>
           <Col md={12}>
-            <h4 style={{paddingLeft: 15}}>Your Twitter data</h4>
+            <h4 style={{padding: '0 15px 8px'}}>Your Twitter data</h4>
           </Col>
         </Row>
         <Row>

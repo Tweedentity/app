@@ -3,9 +3,9 @@ import LoadingBadge from './extras/LoadingBadge'
 import Basic from './Basic'
 import EventWatcher from '../utils/EventWatcher'
 import BigAlert from './extras/BigAlert'
+import GasPrice from './GasPrice'
 
-const {Panel, Grid, Row, Col, Button} = ReactBootstrap
-
+const {Panel, Grid, Row, Col, Button, Alert} = ReactBootstrap
 
 class Set extends Basic {
   constructor(props) {
@@ -16,7 +16,9 @@ class Set extends Basic {
       'startTransaction',
       'goToProfile',
       'checkUpgradability',
-      'investigateNotUpgradability'
+      'investigateNotUpgradability',
+      'setCost',
+      'handlePrice'
     ]) {
       this[m] = this[m].bind(this)
     }
@@ -49,12 +51,12 @@ class Set extends Basic {
           this.props.app.contracts.manager.minimumTimeBeforeUpdate((err, result) => {
             const minimumTimeBeforeUpdate = parseInt(result.valueOf(), 10)
             const lastUpdate = addressLastUpdate > uidLastUpdate ? addressLastUpdate : uidLastUpdate
-            const now = Math.round(Date.now()/1000)
+            const now = Math.round(Date.now() / 1000)
             const timeNeed = lastUpdate + minimumTimeBeforeUpdate - now
             this.setState({
-                timeNeed,
-                upgradabilityMessage: `you have set it recently and, for security reason, you have to wait ${timeNeed} seconds before updating it.`
-              })
+              timeNeed,
+              upgradabilityMessage: `you have set it recently and, as an anti-spam limitation, you have to wait ${timeNeed} seconds before updating it.`
+            })
           })
         })
       })
@@ -63,11 +65,18 @@ class Set extends Basic {
   }
 
   checkUpgradability() {
-    const wallet = this.appState().wallet
+    const as = this.appState()
+    const wallet = as.wallet
     this.props.app.contracts.manager.getUpgradability(1, wallet, this.getGlobalState('userId'), (err, result) => {
+      const upgradability = parseInt(result.valueOf(), 10)
       this.setState({
-        upgradability: parseInt(result.valueOf(), 10)
+        upgradability
       })
+      if (upgradability === 0) {
+        const average = this.formatFloat(as.gasInfo.average / 10, 1)
+        this.setCost(parseFloat(average, 10))
+      }
+
     })
   }
 
@@ -134,7 +143,7 @@ class Set extends Basic {
       let contracts = this.props.app.contracts
 
       const oraclizeCost = Math.round(1e7 / ethPrice)
-      const gasPrice = gasInfo.safeLow * 1e8
+      const gasPrice = this.state.price * 1e9
       const gasLimitBase = 170e3 + oraclizeCost
       const gasLimit = gasLimitBase + Math.round(100 * Math.random())
 
@@ -270,6 +279,36 @@ class Set extends Basic {
     return f[0] + (f[1] ? '.' + f[1].substring(0, d) : '')
   }
 
+  setCost(price) {
+    const as = this.appState()
+    if (as.price) {
+      const gasPrice = price * 1e8
+      const ethPrice = parseFloat(as.price, 10)
+      const oraclizeCost = Math.round(1e7 / ethPrice)
+      const gasLimitTx = 290e3
+      const gasLimitOraclize = oraclizeCost + 170e3
+      const gasLimit = gasLimitTx + gasLimitOraclize
+
+      this.setState({
+        price,
+        eth: this.formatFloat(gasPrice * gasLimit / 1e17, 6),
+        usd: this.formatFloat(ethPrice * gasPrice * gasLimit / 1e17, 3)
+      })
+    }
+    else {
+      this.props.getEthInfo()
+      this.setGlobalState({}, {
+        err: 'No ether and gas info found.',
+        errMessage: 'Reloading them. Try again in a moment.',
+        loading: false
+      })
+    }
+  }
+
+  handlePrice(price) {
+    this.setCost(price)
+  }
+
   render() {
 
     const as = this.appState()
@@ -278,40 +317,79 @@ class Set extends Basic {
 
     if (!state.started) {
 
-      const price = parseFloat(as.price, 10)
-      const gasPrice = as.gasInfo.safeLow * 1e8
-      const gasLimit = 185e3
-
-      const cost = this.formatFloat(gasPrice * gasLimit / 1e18, 4)
-      const cost$ = this.formatFloat(price * gasPrice * gasLimit / 1e18, 2)
-      const safeLow = this.formatFloat(as.gasInfo.safeLow /10, 1)
+      const safeLow = this.formatFloat(as.gasInfo.safeLow / 10, 1)
+      const sl = parseFloat(safeLow, 10)
+      const average = this.formatFloat(as.gasInfo.average / 10, 1)
+      const a = parseFloat(average, 10)
 
       return (
         <Grid>
           <Row>
             <Col md={12}>
-              <h4 style={{paddingLeft: 15}}>Set your <em>tweedentity</em></h4>
+              <h4 style={{padding: '0 15px 8px'}}>Set your <em>tweedentity</em></h4>
               <Panel>
                 <Panel.Body>
                   <p><strong>All is ready</strong></p>
-                  <p>In the next step, since the current gasSafeLow is {safeLow} GWei, you will send {cost} ether (${cost$}) to the Tweedentity Smart Contract to
-                    cover the gas necessary to set your <em>tweedentity</em> in the Ethereum Blockchain. Be
+                  <p>In the next step, you will send a bit of ether to the Tweedentity Smart Contract to
+                    cover the gas necessary to set your <em>tweedentity</em> in the Ethereum Blockchain.</p>
+                  <p>Be
                     adviced, after than you have created it, your Twitter user-id and your wallet will be publicly
-                    associated.</p>
+                    associated.
+                  </p>
                   <p><span className="code">TwitterUserId:</span> <span
                     className="code success">{state.userId}</span><br/>
                     <span className="code">Wallet:</span> <span
                       className="code success">{as.wallet}</span>
                   </p>
-                  {
-                    as.err
-                      ? <p><BigAlert
-                        title={as.err}
-                        message={as.errMessage}
-                      /></p>
-                      : ''
-                  }
-                  {this.state.upgradability === 0 || (typeof this.state.timeNeed !== 'undefined' && this.state.timeNeed > 10) ?
+                </Panel.Body>
+              </Panel>
+            </Col>
+          </Row>
+
+          {
+            this.state.upgradability === 0 || (typeof this.state.timeNeed !== 'undefined' && this.state.timeNeed < 10)
+              ?
+              <div style={{paddingTop: 24}}>
+                <Row>
+                  <Col md={12}>
+                        <p><strong>Choose how much you like to spend</strong></p>
+                        <p>Based on <a href="https://ethgasstation.info" target="_blank">ETH Gas Station</a>, currently {
+                          sl != a
+                            ? <span>the safe low price is <strong>{safeLow} Gwei</strong> while the
+                      average price is <strong>{average} Gwei</strong></span>
+                            : <span>safe low and average price are <strong>{safeLow} Gwei</strong></span>
+                        }.
+                        </p>
+                    <p>Usually the average price is the best choice. Going lower than the safe low price can require hours to complete the set up. Prices higher than the average should complete the set up in a couple of minutes. Going too higher than the average is not very useful.</p>
+                    {
+                      a > 4
+                        ? <p>If you aren't in a rush and can wait a better moment to set up your tweedentity, you can save money because often the gas price is around 1 or 2 Gwei.</p>
+                      : null
+                    }
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={6}>
+                    <p>
+                      <GasPrice
+                        handlePrice={this.handlePrice}
+                        safeLow={sl}
+                        average={a}
+                      />
+                    </p>
+                    <p>Total cost: {this.state.eth} ETH ( ~${this.state.usd} )</p>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={12}>
+                    {
+                      as.err
+                        ? <p style={{ paddingTop: 12}}><BigAlert
+                          title={as.err}
+                          message={as.errMessage}
+                        /></p>
+                        : ''
+                    }
                     <p><LoadingButton
                       text={as.err ? 'Try again' : 'Set it now!'}
                       loadingText="Starting transaction"
@@ -319,25 +397,33 @@ class Set extends Basic {
                       cmd={() => {
                         this.startTransaction(as)
                       }}
-                    /></p> :
-
-                    this.state.upgradabilityMessage
-                    ? <p><BigAlert
-                        bsStyle="warning"
-                        message={`The tweedentity is not upgradable because ${this.state.upgradabilityMessage}`}
-                      /></p>
-                    : <p><BigAlert
+                    /></p>
+                  </Col>
+                </Row>
+              </div>
+              :
+              this.state.upgradabilityMessage
+                ? <Row>
+                  <Col md={12}>
+                    <p><BigAlert
+                      bsStyle="warning"
+                      message={`The tweedentity is not upgradable because ${this.state.upgradabilityMessage}`}
+                    /></p>
+                  </Col>
+                </Row>
+                : <Row>
+                  <Col md={12}>
+                    <p><BigAlert
                       bsStyle="warning"
                       title="Whoops"
                       message="The tweedentity looks not upgradable"
                       link={this.investigateNotUpgradability}
                       linkMessage="Find why"
-                    /></p>}
+                    /></p>
+                  </Col>
+                </Row>
+          }
 
-                </Panel.Body>
-              </Panel>
-            </Col>
-          </Row>
         </Grid>
       )
     } else {
@@ -350,21 +436,21 @@ class Set extends Basic {
         <Grid>
           <Row>
             <Col md={12}>
-              <h4 style={{paddingLeft: 15}}>Verification started
+              <h4 style={{padding: '0 15px 8px'}}>Verification started
               </h4>
               <p><span className="mr12">
-                    <LoadingBadge
-                      text="1"
-                      loading={false}
-                    />
-                  </span>
+          <LoadingBadge
+            text="1"
+            loading={false}
+          />
+          </span>
                 The transaction has been requested.</p>
               <p><span className="mr12">
-                    <LoadingBadge
-                      text="2"
-                      loading={state.step < 2 && !as.err}
-                    />
-                  </span>
+          <LoadingBadge
+            text="2"
+            loading={state.step < 2 && !as.err}
+          />
+          </span>
                 {
                   state.step === 2
                     ? <span>The {transaction} has been successfully confirmed.</span>

@@ -69,7 +69,7 @@ class WalletStats extends Basic {
       <Grid>
         <Row>
           <Col md={12}>
-            <h4 style={{paddingLeft: 15}}>Wallet Statistics</h4>
+            <h4 style={{padding: '0 15px 8px'}}>Wallet Statistics</h4>
           </Col>
         </Row>
         <Row>

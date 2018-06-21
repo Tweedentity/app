@@ -355,6 +355,7 @@ class Provider {
             .get(url)
             .then(res => {
               abiJson = res.body.result
+
               try {
                 abi = JSON.parse(abiJson)
                 db.set(key, abiJson)

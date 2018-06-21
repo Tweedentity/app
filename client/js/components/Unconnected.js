@@ -20,22 +20,13 @@ class Unconnected extends Basic {
 
         welcomeMessage = <BigAlert
           title="Web3js not found"
-          message="You must either install MetaMask or use a browser compatible with Ethereum like Mist, Parity or Brave."
+          message="You must either install MetaMask or use a browser compatible with Ethereum like Mist, Parity or Brave. On mobile, you could use TrustWallet."
           link="https://metamask.io"
           linkMessage="Get MetaMask"
         />
 
       } else if (netId === '0') {
 
-        welcomeMessage =
-          <BigAlert
-            title="Unsupported network."
-            message="This alpha version supports only Ropsten."
-          />
-
-      } else if (netId === '1') {
-
-        // will be remove in the final version
         welcomeMessage =
           <BigAlert
             title="Unsupported network."

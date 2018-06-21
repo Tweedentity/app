@@ -2,7 +2,7 @@ module.exports = {
   registry: {
     address: {
       ropsten: "0x4454742Cb8F831C4ACA2BcA883a41f06DAFdA444",
-      main: ""
+      main: "0x0a66d93D08FF6C2720267936d48655452745652c"
     },
     abi: [
       {
@@ -305,7 +305,7 @@ module.exports = {
   twitterStore: {
     address: {
       ropsten: '0xdbca62E3d07cfE032468A04324d53729aaF7F0A3',
-      main: ''
+      main: '0x95568C9d79f46e8048344E7319754Aec4b1965d4'
     },
     abi: [
       {

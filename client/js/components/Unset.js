@@ -176,7 +176,7 @@ class Unset extends Basic {
         <Grid>
           <Row>
             <Col md={12}>
-              <h4 style={{paddingLeft: 15}}>Unset your <em>tweedentity</em></h4>
+              <h4 style={{padding: '0 15px 8px'}}>Unset your <em>tweedentity</em></h4>
               <Panel>
                 <Panel.Body>
                   <p><strong>All is ready</strong></p>
@@ -219,7 +219,7 @@ class Unset extends Basic {
         <Grid>
           <Row>
             <Col md={12}>
-              <h4 style={{paddingLeft: 15}}>Verification started
+              <h4 style={{padding: '0 15px 8px'}}>Verification started
               </h4>
               <p><span className="mr12">
                     <LoadingBadge

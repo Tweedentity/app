@@ -19,30 +19,46 @@ class Welcome extends Basic {
 
   getStats(state) {
 
-    this.setGlobalState({}, {
-      loading: true
-    })
+    const as = this.appState()
+    const termsAccepted = as.data.profile && as.data.profile.termsAccepted
 
-    return fetch(window.location.origin + '/api/wallet-stats?r=' + Math.random(), {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        network: this.appState().netId,
-        address: state.wallet
+    if (termsAccepted) {
+
+      this.setGlobalState({}, {
+        loading: true
       })
-    })
-      .then((response) => response.json())
-      .then((responseJson) => {
-        this.setGlobalState({
-          stats: responseJson
-        }, {
-          loading: false
+
+      return fetch(window.location.origin + '/api/wallet-stats?r=' + Math.random(), {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          network: this.appState().netId,
+          address: state.wallet
         })
-        this.historyPush('wallet-stats')
       })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          this.setGlobalState({
+            stats: responseJson
+          }, {
+            loading: false
+          })
+          this.historyPush('wallet-stats')
+        })
+    } else {
+      this.setGlobalState({}, {
+        show: true,
+        modalTitle: 'Whoops',
+        modalBody: 'Before setting your tweedentity you must accept the term of usage and .',
+        secondButton: 'Open the terms',
+        modalAction: () => {
+          this.historyPush('terms')
+        }
+      })
+    }
   }
 
   render() {

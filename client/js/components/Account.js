@@ -22,6 +22,7 @@ class Account extends Basic {
   render() {
 
     const as = this.appState()
+
     let content = <p>Coming soon...</p>
 
     if (this.props.active) {

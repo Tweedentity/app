@@ -20,6 +20,7 @@ import SectionNotFound from './SectionNotFound'
 import ManageAccount from './ManageAccount'
 import Unset from './Unset'
 import LandingPage from './LandingPage'
+import Terms from './Terms'
 
 class App extends React.Component {
 
@@ -297,7 +298,7 @@ class App extends React.Component {
   }
 
   historyBack() {
-    history.back()
+    history.goBack()
   }
 
   historyPush(args) {
@@ -354,9 +355,6 @@ class App extends React.Component {
 
       component = <LandingPage app={app}/>
 
-      if (hash === '#/home') {
-
-      }
 
     } else {
 
@@ -384,6 +382,8 @@ class App extends React.Component {
             component = <ManageAccount app={app}/>
           } else if (hash === '#/unset') {
             component = <Unset app={app}/>
+          } else if (hash === '#/terms') {
+            component = <Terms app={app}/>
           }
         }
       }
@@ -406,6 +406,14 @@ class App extends React.Component {
               <Button onClick={() => {
                 this.setState({show: false})
               }}>{this.state.modalClose || 'Close'}</Button>
+              {
+                this.state.secondButton
+                  ? <Button onClick={() => {
+                    this.state.modalAction()
+                    this.setState({show: false})
+                  }} bsStyle="primary">{this.state.secondButton}</Button>
+                  : null
+              }
             </Modal.Footer>
           </Modal.Dialog>
           : null}

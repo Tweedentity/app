@@ -1,3 +1,4 @@
-# Tweedentity app
+# app
 
-This is a work in progress. Don't fork it, for now. Thanks.
+This repos has been integrated in
+[Tweedentity DApp](https://github.com/Tweedentity/dapp)
